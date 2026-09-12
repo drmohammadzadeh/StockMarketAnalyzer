@@ -1,0 +1,451 @@
+# Stock Market Data Configuration for AI Agents
+# Scope: U.S.-listed equities and ETFs
+# Review provider pricing, rate limits, redistribution rights, and API terms before production use.
+
+config_version: "1.0"
+last_reviewed: "2026-09-12"
+market:
+  region: "US"
+  asset_types: ["stock", "ETF"]
+  exchanges: ["NYSE", "Nasdaq", "NYSE American"]
+  currency: "USD"
+  timezone: "America/New_York"
+  regular_session: "09:30-16:00"
+
+secrets:
+  policy: "Read keys from environment variables only; never commit secrets to this file."
+  environment_variables:
+    POLYGON_API_KEY: "Polygon/Massive API key"
+    FINNHUB_API_KEY: "Finnhub API key"
+    ALPHA_VANTAGE_API_KEY: "Alpha Vantage API key"
+    FMP_API_KEY: "Financial Modeling Prep API key"
+    TWELVE_DATA_API_KEY: "Twelve Data API key"
+    TIINGO_API_KEY: "Tiingo API key"
+    NEWS_API_KEY: "NewsAPI key"
+    BENZINGA_API_KEY: "Benzinga API key"
+
+source_priority:
+  # Choose the first enabled source that supports the required field and freshness.
+  authoritative: 1
+  licensed_api: 2
+  exchange_or_broker: 3
+  reputable_aggregator: 4
+  social_or_crowd: 5
+  unofficial_library: 6
+
+sources:
+  market_and_technical:
+    - id: "polygon"
+      name: "Polygon (Massive)"
+      kind: "licensed_api"
+      url: "https://polygon.io/"
+      enabled: true
+      api_key_env: "POLYGON_API_KEY"
+      capabilities: ["real_time_quotes", "historical_ohlcv", "trades", "options", "corporate_actions", "news"]
+      best_for: "Production-grade market data when the selected plan includes the required latency and history."
+      notes: "Confirm exchange entitlements, delay, rate limits, and redistribution rights."
+
+    - id: "twelve_data"
+      name: "Twelve Data"
+      kind: "licensed_api"
+      url: "https://twelvedata.com/"
+      enabled: true
+      api_key_env: "TWELVE_DATA_API_KEY"
+      capabilities: ["intraday_ohlcv", "historical_ohlcv", "technical_indicators", "websocket"]
+      best_for: "Convenient time-series and indicator endpoints."
+
+    - id: "alpha_vantage_market"
+      name: "Alpha Vantage"
+      kind: "licensed_api"
+      url: "https://www.alphavantage.co/"
+      enabled: true
+      api_key_env: "ALPHA_VANTAGE_API_KEY"
+      capabilities: ["intraday_ohlcv", "daily_ohlcv", "technical_indicators", "fundamentals", "news_sentiment"]
+      best_for: "Prototypes and low-volume workflows using a broad single API."
+      notes: "Free-tier rate limits can be restrictive."
+
+    - id: "tiingo"
+      name: "Tiingo"
+      kind: "licensed_api"
+      url: "https://www.tiingo.com/"
+      enabled: false
+      api_key_env: "TIINGO_API_KEY"
+      capabilities: ["adjusted_history", "intraday", "fundamentals", "news"]
+      best_for: "Adjusted historical prices and research workflows."
+
+    - id: "nasdaq_data_link"
+      name: "Nasdaq Data Link"
+      kind: "data_platform"
+      url: "https://data.nasdaq.com/"
+      enabled: false
+      capabilities: ["market_datasets", "economic_data", "alternative_data"]
+      best_for: "Curated free and premium datasets; coverage depends on the dataset."
+
+    - id: "tradingview"
+      name: "TradingView"
+      kind: "website"
+      url: "https://www.tradingview.com/"
+      enabled: true
+      capabilities: ["interactive_charts", "screeners", "indicators", "alerts"]
+      best_for: "Human visual validation and chart review."
+      machine_access: "Use an authorized integration only; do not scrape pages."
+
+    - id: "finviz"
+      name: "Finviz"
+      kind: "website"
+      url: "https://finviz.com/"
+      enabled: true
+      capabilities: ["screener", "charts", "news", "insider_summary"]
+      best_for: "Fast human cross-checking and idea screening."
+      machine_access: "Respect terms and robots rules; prefer a licensed API for automation."
+
+    - id: "yfinance"
+      name: "yfinance"
+      kind: "unofficial_library"
+      url: "https://github.com/ranaroussi/yfinance"
+      enabled: false
+      capabilities: ["historical_prices", "basic_fundamentals", "options"]
+      best_for: "Exploration only."
+      warning: "Unofficial and subject to upstream changes; never use as the sole production source."
+
+  fundamental:
+    - id: "sec_edgar"
+      name: "SEC EDGAR"
+      kind: "authoritative"
+      url: "https://www.sec.gov/edgar/sec-api-documentation"
+      enabled: true
+      authentication: "No API key; send an SEC-compliant User-Agent with organization and contact details."
+      capabilities: ["10-K", "10-Q", "8-K", "forms_3_4_5", "company_facts_xbrl", "submissions"]
+      best_for: "Primary-source filings, reported facts, filing dates, and insider forms."
+      notes: "Honor SEC fair-access limits; normalize amended filings and restatements."
+
+    - id: "fmp"
+      name: "Financial Modeling Prep"
+      kind: "licensed_api"
+      url: "https://financialmodelingprep.com/"
+      enabled: true
+      api_key_env: "FMP_API_KEY"
+      capabilities: ["statements", "ratios", "estimates", "earnings", "insiders", "screeners"]
+      best_for: "Normalized fundamentals and screening."
+      notes: "Validate material figures against the latest SEC filing."
+
+    - id: "finnhub_fundamental"
+      name: "Finnhub"
+      kind: "licensed_api"
+      url: "https://finnhub.io/"
+      enabled: true
+      api_key_env: "FINNHUB_API_KEY"
+      capabilities: ["company_profile", "financials", "metrics", "estimates", "earnings_calendar", "insider_transactions"]
+      best_for: "Company events and normalized fundamentals."
+
+    - id: "simfin"
+      name: "SimFin"
+      kind: "data_platform"
+      url: "https://simfin.com/"
+      enabled: false
+      capabilities: ["standardized_statements", "ratios", "bulk_downloads"]
+      best_for: "Fundamental research and reproducible datasets."
+
+    - id: "macrotrends"
+      name: "Macrotrends"
+      kind: "website"
+      url: "https://www.macrotrends.net/"
+      enabled: true
+      capabilities: ["long_term_financial_charts", "valuation_history", "macro_series"]
+      best_for: "Human historical cross-checking."
+      machine_access: "Do not scrape unless explicitly permitted."
+
+  sentiment_news_and_alternative:
+    - id: "finnhub_sentiment"
+      name: "Finnhub"
+      kind: "licensed_api"
+      url: "https://finnhub.io/"
+      enabled: true
+      api_key_env: "FINNHUB_API_KEY"
+      capabilities: ["company_news", "news_sentiment", "social_sentiment", "earnings_calendar"]
+      best_for: "Structured company news and sentiment features."
+
+    - id: "benzinga"
+      name: "Benzinga APIs"
+      kind: "licensed_api"
+      url: "https://www.benzinga.com/apis/"
+      enabled: false
+      api_key_env: "BENZINGA_API_KEY"
+      capabilities: ["news", "analyst_ratings", "earnings", "economic_calendar", "signals"]
+      best_for: "Time-sensitive market news and event data."
+
+    - id: "newsapi"
+      name: "NewsAPI"
+      kind: "licensed_api"
+      url: "https://newsapi.org/"
+      enabled: false
+      api_key_env: "NEWS_API_KEY"
+      capabilities: ["publisher_news_search", "headline_collection"]
+      best_for: "Broad headline collection; licensing and full-text access vary."
+
+    - id: "gdelt"
+      name: "GDELT Project"
+      kind: "open_data"
+      url: "https://www.gdeltproject.org/"
+      enabled: true
+      capabilities: ["global_news_events", "tone", "themes", "geographic_context"]
+      best_for: "Broad news-volume and tone signals, especially macro or geopolitical context."
+
+    - id: "stocktwits"
+      name: "Stocktwits"
+      kind: "social_or_crowd"
+      url: "https://stocktwits.com/"
+      enabled: true
+      capabilities: ["retail_discussion", "bullish_bearish_labels", "trending_symbols"]
+      best_for: "Retail attention and crowd sentiment confirmation."
+      machine_access: "Use only officially available, authorized access; availability may be limited."
+
+    - id: "reddit"
+      name: "Reddit Data API"
+      kind: "social_or_crowd"
+      url: "https://developers.reddit.com/docs/api"
+      enabled: false
+      capabilities: ["community_posts", "comments", "engagement"]
+      best_for: "Retail narrative and attention analysis."
+      notes: "Follow API terms, privacy rules, and rate limits; filter bots, spam, and ticker ambiguity."
+
+    - id: "google_trends"
+      name: "Google Trends"
+      kind: "website"
+      url: "https://trends.google.com/"
+      enabled: true
+      capabilities: ["relative_search_interest"]
+      best_for: "Attention-change confirmation, not company valuation."
+
+    - id: "ravenpack"
+      name: "RavenPack"
+      kind: "enterprise_platform"
+      url: "https://www.ravenpack.com/"
+      enabled: false
+      capabilities: ["entity_resolved_news", "event_analytics", "sentiment", "relevance", "novelty"]
+      best_for: "Institutional-grade news and alternative-data analytics."
+
+  macro_and_calendar:
+    - id: "fred"
+      name: "FRED"
+      kind: "authoritative"
+      url: "https://fred.stlouisfed.org/docs/api/fred/"
+      enabled: true
+      capabilities: ["rates", "inflation", "employment", "credit", "economic_series"]
+      best_for: "U.S. macroeconomic time series."
+
+    - id: "bls"
+      name: "U.S. Bureau of Labor Statistics"
+      kind: "authoritative"
+      url: "https://www.bls.gov/developers/"
+      enabled: true
+      capabilities: ["CPI", "employment", "wages", "productivity"]
+
+    - id: "bea"
+      name: "U.S. Bureau of Economic Analysis"
+      kind: "authoritative"
+      url: "https://apps.bea.gov/api/"
+      enabled: true
+      capabilities: ["GDP", "income", "industry", "international_trade"]
+
+    - id: "nasdaq_calendars"
+      name: "Nasdaq Market Activity Calendars"
+      kind: "exchange_or_broker"
+      url: "https://www.nasdaq.com/market-activity"
+      enabled: true
+      capabilities: ["earnings_calendar", "dividends", "IPOs", "splits"]
+      best_for: "Human calendar cross-checks; prefer an authorized API for automation."
+
+frameworks:
+  ingestion_and_research:
+    - name: "OpenBB Platform"
+      url: "https://openbb.co/"
+      use: "Provider-agnostic research and data access layer."
+    - name: "pandas"
+      url: "https://pandas.pydata.org/"
+      use: "Tabular transformation, alignment, and data-quality checks."
+    - name: "DuckDB"
+      url: "https://duckdb.org/"
+      use: "Local analytical queries over Parquet/CSV without a database server."
+
+  technical_analysis:
+    - name: "TA-Lib"
+      url: "https://ta-lib.org/"
+      use: "Established technical-indicator calculations."
+    - name: "pandas-ta"
+      url: "https://github.com/twopirllc/pandas-ta"
+      use: "Python-native indicator exploration; pin and validate the package version."
+
+  backtesting:
+    - name: "vectorbt"
+      url: "https://vectorbt.dev/"
+      use: "Fast vectorized research and parameter exploration."
+    - name: "Backtrader"
+      url: "https://www.backtrader.com/"
+      use: "Event-driven strategy backtesting."
+
+storage:
+  raw_format: "parquet"
+  partitioning: ["provider", "dataset", "symbol", "date"]
+  retain_raw_payload: true
+  required_metadata:
+    - "provider"
+    - "retrieved_at_utc"
+    - "source_timestamp_utc"
+    - "market_session"
+    - "symbol"
+    - "currency"
+    - "adjustment_status"
+    - "request_parameters"
+    - "provider_record_id_or_url"
+
+data_quality:
+  symbol_master:
+    canonical_identifier: "FIGI_if_available_else_exchange_plus_ticker"
+    handle_ticker_changes: true
+    handle_delistings: true
+  price_rules:
+    use_adjusted_prices_for_returns: true
+    use_unadjusted_prices_for_execution_simulation: true
+    reject_negative_price_or_volume: true
+    flag_zero_volume_during_regular_session: true
+    compare_corporate_actions_before_flagging_price_gaps: true
+  freshness_limits:
+    intraday_quotes_seconds: 60
+    end_of_day_hours_after_close: 6
+    news_minutes: 30
+    filings_hours: 24
+    fundamentals_days: 120
+  cross_validation:
+    critical_fields: ["last_price", "close", "volume", "shares_outstanding", "revenue", "EPS", "filing_date"]
+    require_second_source_when:
+      - "A value changes the trade direction or ranking materially."
+      - "A corporate action, restatement, or amended filing may apply."
+      - "Provider values differ beyond the configured tolerance."
+    tolerances:
+      price_percent: 0.25
+      volume_percent: 5.0
+      fundamental_percent: 1.0
+
+analysis_policy:
+  technical:
+    minimum_history_bars: 252
+    indicators:
+      trend: ["SMA_20", "SMA_50", "SMA_200", "EMA_20", "ADX_14"]
+      momentum: ["RSI_14", "MACD_12_26_9", "rate_of_change_20"]
+      volatility: ["ATR_14", "Bollinger_20_2", "realized_volatility_20"]
+      volume: ["relative_volume_20", "OBV", "VWAP"]
+    rules:
+      - "Calculate indicators locally from validated OHLCV when possible."
+      - "Never mix adjusted and unadjusted price series in one calculation."
+      - "Use split-adjusted history for trend and return analysis."
+
+  fundamental:
+    metrics:
+      growth: ["revenue_growth_yoy", "EPS_growth_yoy", "free_cash_flow_growth_yoy"]
+      quality: ["gross_margin", "operating_margin", "ROIC", "free_cash_flow_margin"]
+      valuation: ["forward_PE", "EV_EBITDA", "price_to_free_cash_flow", "PEG"]
+      balance_sheet: ["net_debt_to_EBITDA", "current_ratio", "interest_coverage"]
+    rules:
+      - "Prefer SEC-filed GAAP facts; label non-GAAP measures explicitly."
+      - "Use point-in-time data that was publicly available on the analysis date."
+      - "Track fiscal period, accession number, filing date, amendments, and restatements."
+      - "Compare valuation within sector and industry; do not use one universal threshold."
+
+  sentiment:
+    lookback_windows: ["1h", "24h", "7d"]
+    fields: ["document_count", "unique_authors", "sentiment_score", "sentiment_change", "attention_change", "source_mix"]
+    rules:
+      - "Resolve company entities; do not rely only on ticker text."
+      - "Deduplicate syndicated news and near-identical social posts."
+      - "Down-weight bots, spam, low-relevance mentions, and repeated authors."
+      - "Measure change versus the symbol's own baseline, not raw mention count alone."
+      - "Never generate a trade recommendation from sentiment alone."
+
+scoring:
+  # Scores are research prioritization aids, not trade instructions.
+  range: [-100, 100]
+  weights:
+    technical: 0.35
+    fundamental: 0.40
+    sentiment: 0.15
+    macro_and_event_risk: 0.10
+  confidence:
+    start: 1.0
+    penalties:
+      stale_data: 0.30
+      missing_primary_source: 0.25
+      unresolved_source_conflict: 0.25
+      insufficient_history: 0.20
+      low_sentiment_sample: 0.15
+    minimum_to_publish_ranked_idea: 0.65
+
+agent_instructions:
+  role: "Market-research assistant, not an autonomous financial adviser or trade executor."
+  workflow:
+    - "Read this entire config before selecting a provider."
+    - "Determine the user's market, symbol, as-of time, horizon, and required latency."
+    - "Use only enabled sources and only through permitted APIs, feeds, downloads, or manual review."
+    - "Prefer authoritative and licensed sources according to source_priority."
+    - "Fetch raw data, record provenance, normalize timestamps to UTC, and retain the market timezone."
+    - "Run data-quality, freshness, corporate-action, and cross-source validation checks."
+    - "Compute derived metrics locally with named formulas, parameters, and input windows."
+    - "Separate observed facts, calculated signals, third-party opinions, and agent inference."
+    - "If critical data is unavailable, stale, or conflicting, reduce confidence or return INSUFFICIENT_DATA."
+    - "Report the bullish case, bearish case, catalysts, risks, invalidation conditions, and time horizon."
+    - "Cite the provider and source timestamp beside every material claim or in a source table."
+    - "State that results are informational research, not personalized investment advice."
+
+  prohibited_actions:
+    - "Do not invent prices, fundamentals, headlines, filings, analyst ratings, or sentiment."
+    - "Do not scrape a website when its terms, robots rules, or access controls prohibit it."
+    - "Do not bypass paywalls, authentication, rate limits, CAPTCHAs, or provider restrictions."
+    - "Do not expose API keys, tokens, account IDs, private positions, or personal data."
+    - "Do not claim data is real time unless the provider plan and timestamp confirm it."
+    - "Do not use future information in historical backtests; prevent look-ahead and survivorship bias."
+    - "Do not execute a trade unless a separate, explicit execution policy and user authorization exist."
+
+  output_contract:
+    required_fields:
+      - "symbol"
+      - "company_name"
+      - "as_of_utc"
+      - "market_session"
+      - "time_horizon"
+      - "technical_summary"
+      - "fundamental_summary"
+      - "sentiment_summary"
+      - "catalysts"
+      - "risks"
+      - "composite_score"
+      - "confidence_score"
+      - "data_gaps"
+      - "sources"
+      - "disclaimer"
+    source_fields: ["provider", "dataset_or_endpoint", "source_timestamp_utc", "retrieved_at_utc", "url_or_record_id"]
+    status_values: ["COMPLETE", "PARTIAL", "INSUFFICIENT_DATA"]
+
+backtesting_rules:
+  - "Use point-in-time fundamentals and the actual publication timestamp."
+  - "Include delisted securities when testing a historical universe."
+  - "Model commissions, bid-ask spread, slippage, latency, and liquidity constraints."
+  - "Use walk-forward or out-of-sample evaluation; do not tune on the final test set."
+  - "Report CAGR, volatility, Sharpe, Sortino, max drawdown, turnover, exposure, and trade count."
+  - "Compare against an appropriate benchmark and disclose the sample period."
+
+recommended_starting_stack:
+  low_cost_prototype:
+    market_data: "Alpha Vantage or Twelve Data"
+    filings: "SEC EDGAR"
+    normalized_fundamentals: "Financial Modeling Prep or Finnhub"
+    news_sentiment: "Finnhub plus GDELT"
+    human_validation: "TradingView and Finviz"
+    framework: "OpenBB + pandas + TA-Lib/pandas-ta + DuckDB"
+  production_research:
+    market_data: "Polygon/Massive or another exchange-licensed feed"
+    filings: "SEC EDGAR"
+    fundamentals: "Licensed normalized provider validated against SEC filings"
+    sentiment: "Licensed news feed; RavenPack or Benzinga when budget permits"
+    storage: "Versioned Parquet in object storage plus a point-in-time catalog"
+
+disclaimer: "This configuration supports informational market research. It does not guarantee data accuracy or investment performance and is not personalized financial advice."
