@@ -1,0 +1,478 @@
+# Undervalued Stock Screening Rules for AI Agents
+# Designed to work with: stock_market_data_config.yaml
+# Scope: research and ranking of U.S.-listed stocks; not autonomous trade execution.
+
+config_version: "1.0"
+last_reviewed: "2026-09-13"
+extends: "stock_market_data_config.yaml"
+
+objective:
+  name: "Find financially sound stocks trading below conservative estimates of fair value"
+  output_count: 10
+  holding_horizon: "6-24 months"
+  market: "US"
+  base_currency: "USD"
+  definition: >-
+    A stock is a qualified undervalued candidate only when at least two suitable
+    valuation methods indicate a discount, minimum quality and financial-health
+    gates pass, data is point-in-time and fresh, and no critical value-trap rule fires.
+
+agent_role:
+  description: "Equity research and screening assistant"
+  limitations:
+    - "Do not provide personalized investment advice."
+    - "Do not place or recommend automatic trades."
+    - "Do not describe a stock as undervalued from one ratio alone."
+    - "Return INSUFFICIENT_DATA when required evidence is missing or inconsistent."
+
+universe:
+  security_types: ["common_stock"]
+  exchanges: ["NYSE", "Nasdaq", "NYSE American"]
+  allow_adrs: true
+  exclude:
+    - "OTC securities"
+    - "SPACs before a completed business combination"
+    - "closed-end funds"
+    - "ETFs"
+    - "preferred shares"
+    - "warrants"
+    - "shell companies"
+  minimums:
+    market_cap_usd: 500000000
+    share_price_usd: 5.00
+    median_daily_dollar_volume_60d_usd: 5000000
+    trading_history_days: 252
+  maximum_bid_ask_spread_percent: 1.0
+
+data_requirements:
+  required_sources:
+    prices: "Enabled licensed market-data source from stock_market_data_config.yaml"
+    primary_financials: "SEC EDGAR filings and Company Facts/XBRL"
+    normalized_financials: "Enabled normalized fundamental-data provider"
+    risk_free_rate: "Current U.S. Treasury maturity matched to the valuation horizon"
+    macro_history: "FRED; use ALFRED vintages for historical backtests when applicable"
+  required_periods:
+    annual_years: 5
+    quarterly_periods: 12
+    price_history_years: 5
+  freshness:
+    price_minutes_during_session: 15
+    price_hours_after_close: 6
+    filing_hours_after_sec_publication: 24
+    analyst_estimates_days: 7
+    macro_days: 7
+  point_in_time_rules:
+    - "Use only information publicly available at the as-of timestamp."
+    - "Store filing date, accepted timestamp, accession number, fiscal period, form, and amendment status."
+    - "Never use a later restatement or revised estimate in a historical screen."
+    - "For backtests, use historical index membership and retain delisted securities."
+  validation:
+    - "Reconcile material normalized figures against the latest SEC filing."
+    - "Adjust price history for splits and distributions when calculating returns."
+    - "Do not mix adjusted and unadjusted prices in one formula."
+    - "Normalize currencies, units, fiscal calendars, and per-share denominators."
+    - "Resolve ticker changes, dual listings, ADR ratios, and corporate actions."
+
+stage_1_hard_gates:
+  # A candidate must pass every applicable rule.
+  general:
+    positive_ttm_revenue: true
+    positive_ttm_operating_cash_flow: true
+    positive_ttm_free_cash_flow: true
+    positive_ttm_normalized_eps: true
+    minimum_positive_fcf_years_of_last_3: 2
+    minimum_interest_coverage: 2.5
+    maximum_net_debt_to_ebitda: 4.0
+    minimum_current_ratio: 1.0
+    maximum_share_dilution_yoy_percent: 5.0
+    no_going_concern_warning: true
+    no_overdue_sec_filings: true
+  quality_exceptions:
+    - "Do not apply EBITDA leverage or interest-coverage gates to banks and insurers."
+    - "Do not apply the current-ratio gate to banks, insurers, or REITs."
+    - "Sector-specific gates below override general gates."
+
+stage_2_value_trap_detection:
+  reject_on_critical:
+    - id: "going_concern"
+      rule: "Latest filing contains a going-concern warning."
+    - id: "auditor_issue"
+      rule: "Adverse opinion, disclaimer, or unresolved material accounting concern."
+    - id: "stale_filings"
+      rule: "Required SEC filing is late, missing, or stale."
+    - id: "distress"
+      rule: "Bankruptcy, restructuring, covenant breach, or severe liquidity warning is active."
+    - id: "persistent_negative_fcf"
+      rule: "Free cash flow is negative in each of the last three fiscal years."
+    - id: "extreme_dilution"
+      rule: "Diluted share count increased more than 15% year over year without a documented acquisition rationale."
+    - id: "unreconciled_data"
+      rule: "Critical fundamental values conflict across sources beyond tolerance and cannot be reconciled."
+  penalize:
+    - id: "structural_decline"
+      condition: "Revenue CAGR_3Y < -5% and no credible stabilization evidence"
+      penalty_points: 12
+    - id: "margin_collapse"
+      condition: "TTM operating margin is more than 30% below its 5-year median"
+      penalty_points: 10
+    - id: "accrual_risk"
+      condition: "Net income materially exceeds operating cash flow for 2 consecutive years"
+      penalty_points: 8
+    - id: "debt_growth"
+      condition: "Net debt growth exceeds revenue growth by more than 15 percentage points YoY"
+      penalty_points: 8
+    - id: "customer_concentration"
+      condition: "Largest disclosed customer represents more than 25% of revenue"
+      penalty_points: 5
+    - id: "insider_selling"
+      condition: "Unusually high non-routine insider selling relative to holdings"
+      penalty_points: 4
+    - id: "negative_estimate_revision"
+      condition: "Consensus next-year EPS fell by more than 10% in the last 90 days"
+      penalty_points: 6
+
+stage_3_company_classification:
+  # Classification determines which valuation models are valid.
+  categories:
+    bank:
+      industries: ["Banks", "Thrifts", "Diversified Banks"]
+      preferred_models: ["price_to_tangible_book", "forward_PE", "residual_income"]
+      required_quality_metrics: ["CET1_ratio", "nonperforming_assets", "net_charge_offs", "ROE", "ROTE"]
+      invalid_models: ["EV_EBITDA", "generic_net_debt_to_EBITDA"]
+    insurer:
+      industries: ["Insurance"]
+      preferred_models: ["price_to_book", "forward_PE", "residual_income"]
+      required_quality_metrics: ["combined_ratio_if_applicable", "reserve_development", "ROE", "capital_adequacy"]
+      invalid_models: ["generic_EV_EBITDA"]
+    reit:
+      industries: ["Equity REITs"]
+      preferred_models: ["price_to_AFFO", "NAV_discount", "dividend_discount_if_stable"]
+      required_quality_metrics: ["occupancy", "same_store_NOI_growth", "debt_maturity_profile", "fixed_charge_coverage"]
+      invalid_models: ["PE", "GAAP_EPS_growth_as_primary"]
+    profitable_nonfinancial:
+      match: "Positive normalized earnings and positive normalized free cash flow"
+      preferred_models: ["DCF_FCFF", "EV_EBIT", "EV_EBITDA", "price_to_FCF", "earnings_yield"]
+    cyclical_or_commodity:
+      match: "Earnings strongly linked to economic or commodity cycles"
+      preferred_models: ["midcycle_EV_EBIT", "normalized_FCF", "replacement_value_if_available"]
+      required_adjustment: "Use 5-10 year normalized margins and commodity assumptions; do not capitalize peak earnings."
+    unprofitable_growth:
+      match: "Negative normalized earnings or free cash flow"
+      preferred_models: ["reverse_DCF", "EV_to_revenue_relative", "unit_economics"]
+      rule: "Label SPECULATIVE_VALUE; never rank with profitable companies unless a credible path to positive FCF is demonstrated."
+
+stage_4_relative_valuation:
+  peer_group:
+    primary: "GICS industry"
+    fallback: "GICS sector"
+    minimum_peer_count: 8
+    controls: ["business_model", "revenue_growth", "margin_profile", "size", "leverage", "geography"]
+  winsorize_peer_metrics_percentiles: [5, 95]
+  minimum_valid_metrics: 2
+  general_thresholds:
+    # Lower percentile is cheaper. Percentiles are within the controlled peer group.
+    forward_PE_percentile_max: 35
+    EV_EBITDA_percentile_max: 35
+    EV_EBIT_percentile_max: 35
+    price_to_FCF_percentile_max: 35
+    earnings_yield_percentile_min: 65
+    FCF_yield_percentile_min: 65
+    minimum_discount_to_peer_median_percent: 20
+  self_history:
+    years: 5
+    minimum_observations: 12
+    maximum_percentile_of_own_history: 35
+  metric_rules:
+    - "Use forward multiples only when estimate coverage is sufficient and dispersion is disclosed."
+    - "Use trailing multiples with normalized earnings for cyclicals."
+    - "Treat negative or near-zero denominators as not meaningful, never as cheap."
+    - "Do not compare raw multiples across structurally different industries."
+    - "Price-to-book is a primary metric only for financials and asset-heavy businesses."
+
+stage_5_intrinsic_valuation:
+  minimum_applicable_models: 1
+  dcf:
+    projection_years: 5
+    scenarios:
+      bear_probability: 0.25
+      base_probability: 0.50
+      bull_probability: 0.25
+    forecast_rules:
+      - "Anchor growth and margins to historical performance, industry economics, and explicit evidence."
+      - "Fade extraordinary growth and margins toward sustainable industry levels."
+      - "Forecast reinvestment consistently with revenue and operating-profit growth."
+      - "Do not substitute net income for free cash flow."
+    discount_rate:
+      model: "WACC for FCFF; cost of equity for FCFE or residual income"
+      risk_free_rate: "Current matched-maturity U.S. Treasury yield"
+      equity_risk_premium: "Current documented implied or historical ERP source"
+      beta: "Bottom-up industry beta preferred; relever to company capital structure"
+      small_company_or_country_premium: "Apply only with documented justification"
+    terminal_value:
+      primary_method: "perpetuity_growth"
+      cross_check: "exit_multiple"
+      maximum_growth_rule: "Must not exceed a conservative long-run nominal economic growth assumption"
+      maximum_terminal_value_percent_of_enterprise_value: 75
+    sensitivity:
+      wacc_change_percentage_points: [-1.0, -0.5, 0.0, 0.5, 1.0]
+      terminal_growth_change_percentage_points: [-1.0, -0.5, 0.0, 0.5, 1.0]
+    required_margin_of_safety_percent: 25
+  reverse_dcf:
+    required: true
+    purpose: "Calculate the growth and margin assumptions implied by the current price."
+    pass_rule: "Implied expectations are materially below a defensible base case."
+  residual_income:
+    use_for: ["banks", "insurers", "companies where book value and ROE are meaningful"]
+  reit_nav:
+    use_for: ["equity_REITs"]
+    required_inputs: ["property_NOI", "market_cap_rate", "net_debt", "other_assets_and_liabilities", "share_count"]
+
+stage_6_quality_and_health:
+  quality_score_metrics:
+    profitability:
+      - "ROIC above estimated WACC"
+      - "positive and stable operating margin"
+      - "positive and stable free-cash-flow margin"
+    earnings_quality:
+      - "operating cash flow divided by net income"
+      - "accruals relative to assets"
+      - "difference between GAAP and adjusted earnings"
+    capital_allocation:
+      - "share repurchases below conservative intrinsic value"
+      - "acquisitions with disclosed returns or strategic evidence"
+      - "dividend coverage by free cash flow"
+    balance_sheet:
+      - "debt maturity schedule"
+      - "liquidity and covenant headroom"
+      - "fixed versus floating-rate debt"
+  piotroski_f_score:
+    enabled: true
+    applies_when: "Sufficient standardized statements exist"
+    minimum_score: 6
+    note: "Use as a supporting health signal, not a standalone decision rule."
+  roic_rule:
+    minimum_spread_over_wacc_percentage_points: 1.0
+    allow_exception: "Documented turnaround with improving unit economics"
+
+stage_7_growth_and_catalysts:
+  growth_quality:
+    minimum_revenue_cagr_3y_percent: -5
+    prefer_positive_fcf_per_share_cagr: true
+    penalize_growth_funded_by_persistent_dilution: true
+  catalyst_window_months: 18
+  recognized_catalysts:
+    - "margin normalization supported by leading indicators"
+    - "deleveraging or refinancing"
+    - "credible cost reduction"
+    - "asset sale, spin-off, or simplification"
+    - "new product, capacity, or contract with quantified economics"
+    - "temporary regulatory or litigation overhang approaching resolution"
+    - "capital return supported by free cash flow"
+  rule: "A catalyst improves rank but is not required if the valuation gap and quality are exceptional."
+
+stage_8_technical_and_sentiment_confirmation:
+  purpose: "Entry timing and risk context only; never establish intrinsic value."
+  maximum_combined_weight_percent: 10
+  technical:
+    positive_signals:
+      - "price above 50-day moving average"
+      - "50-day moving average rising"
+      - "positive 6-month relative strength versus sector"
+      - "accumulation supported by volume"
+    avoid_chasing_rule: "Flag if price is more than 2 ATR above the 20-day moving average."
+  sentiment:
+    positive_signals:
+      - "analyst estimate revisions stabilize or improve"
+      - "news sentiment improves from a depressed company-specific baseline"
+      - "short interest declines without deterioration in fundamentals"
+    controls:
+      - "Deduplicate news and filter bots/spam."
+      - "Resolve company entities rather than relying only on ticker text."
+      - "Sentiment cannot override failed quality, solvency, or valuation gates."
+
+scoring:
+  total_points: 100
+  components:
+    relative_valuation: 20
+    intrinsic_value_margin_of_safety: 25
+    business_quality: 20
+    financial_health: 15
+    growth_and_earnings_stability: 10
+    catalyst_evidence: 5
+    technical_and_sentiment_confirmation: 5
+  value_trap_penalty_max: 35
+  classification:
+    strong_candidate:
+      minimum_score: 80
+      minimum_confidence: 0.80
+      minimum_valuation_methods_passing: 2
+      minimum_margin_of_safety_percent: 25
+    watchlist:
+      minimum_score: 70
+      minimum_confidence: 0.70
+      minimum_valuation_methods_passing: 2
+    research_required:
+      minimum_score: 60
+      minimum_confidence: 0.60
+    reject:
+      maximum_score: 59.99
+  caps:
+    failed_hard_gate: 49
+    critical_value_trap: 49
+    only_one_valid_valuation_method: 69
+    stale_or_unreconciled_critical_data: 59
+    speculative_value: 69
+
+confidence_model:
+  starting_confidence: 1.00
+  deductions:
+    missing_primary_filing: 0.30
+    stale_price: 0.20
+    stale_fundamental_data: 0.20
+    unresolved_source_conflict: 0.20
+    insufficient_peer_count: 0.10
+    high_estimate_dispersion: 0.10
+    limited_operating_history: 0.10
+    weak_sentiment_sample: 0.05
+  minimum_confidence_to_publish: 0.60
+
+ranking_and_diversification:
+  rank_by: ["classification", "total_score", "confidence", "margin_of_safety"]
+  maximum_stocks_per_gics_sector_in_top_10: 3
+  maximum_stocks_per_industry_in_top_10: 2
+  tie_breakers:
+    - "higher confidence"
+    - "lower balance-sheet risk"
+    - "higher free-cash-flow yield"
+    - "lower earnings-estimate dispersion"
+
+agent_workflow:
+  - step: 1
+    action: "Load this file and stock_market_data_config.yaml completely."
+  - step: 2
+    action: "State the as-of timestamp, universe, holding horizon, and data sources."
+  - step: 3
+    action: "Build the eligible universe and apply liquidity/security-type filters."
+  - step: 4
+    action: "Fetch point-in-time prices, filings, fundamentals, estimates, and corporate actions."
+  - step: 5
+    action: "Validate data, reconcile critical values, and calculate trailing and normalized metrics."
+  - step: 6
+    action: "Apply hard gates and value-trap rules before valuation."
+  - step: 7
+    action: "Classify each company and select only valuation methods valid for that category."
+  - step: 8
+    action: "Calculate peer-relative, own-history, intrinsic-value, and reverse-DCF evidence."
+  - step: 9
+    action: "Score quality, financial health, growth stability, catalysts, and confirmation signals."
+  - step: 10
+    action: "Apply penalties, score caps, confidence deductions, and diversification limits."
+  - step: 11
+    action: "For every finalist, explain why it may be cheap and what evidence could invalidate the thesis."
+  - step: 12
+    action: "Return ranked results using the output contract; never fill missing values with guesses."
+
+output_contract:
+  status_values: ["COMPLETE", "PARTIAL", "INSUFFICIENT_DATA"]
+  required_top_level_fields:
+    - "status"
+    - "screen_as_of_utc"
+    - "market_session"
+    - "universe_size"
+    - "eligible_count"
+    - "ranked_candidates"
+    - "rejected_candidate_summary"
+    - "methodology_notes"
+    - "data_gaps"
+    - "disclaimer"
+  candidate_fields:
+    - "rank"
+    - "ticker"
+    - "company_name"
+    - "sector"
+    - "company_category"
+    - "current_price"
+    - "price_timestamp_utc"
+    - "base_fair_value"
+    - "fair_value_range"
+    - "margin_of_safety_percent"
+    - "relative_valuation_evidence"
+    - "intrinsic_valuation_evidence"
+    - "reverse_dcf_implied_expectations"
+    - "quality_evidence"
+    - "financial_health_evidence"
+    - "catalysts"
+    - "bear_case"
+    - "value_trap_flags"
+    - "thesis_invalidation_conditions"
+    - "total_score"
+    - "confidence_score"
+    - "classification"
+    - "source_references"
+  source_reference_fields:
+    - "provider"
+    - "filing_or_dataset"
+    - "accession_number_or_record_id"
+    - "source_timestamp_utc"
+    - "retrieved_at_utc"
+    - "url"
+
+required_agent_language:
+  facts: "Use definitive wording only for directly verified facts."
+  estimates: "Label forecasts, fair values, and scenarios as estimates."
+  inference: "State 'Agent inference' before conclusions derived from multiple signals."
+  uncertainty: "Explain material uncertainty and show sensitivity ranges."
+  forbidden_phrases_without_evidence:
+    - "guaranteed return"
+    - "risk-free stock"
+    - "sure winner"
+    - "definitely undervalued"
+
+prohibited_practices:
+  - "No look-ahead bias, survivorship bias, or use of revised data in historical screens."
+  - "No comparison of invalid multiples caused by negative denominators."
+  - "No sector-blind use of PE, EV/EBITDA, price-to-book, or FCF yield."
+  - "No fabricated prices, filings, estimates, peers, catalysts, or sentiment."
+  - "No unauthorized scraping, paywall bypass, CAPTCHA bypass, or rate-limit evasion."
+  - "No API keys or credentials in output, logs, prompts, source control, or this file."
+  - "No trade execution without a separate execution policy and explicit user authorization."
+
+backtest_validation:
+  rebalance_frequency: "monthly"
+  holding_periods_months: [6, 12, 24]
+  benchmark: "S&P 500 or sector-matched benchmark"
+  required_costs: ["commissions", "bid_ask_spread", "slippage", "delisting_returns"]
+  evaluation:
+    - "walk-forward or out-of-sample testing"
+    - "sector-neutral comparison"
+    - "market-cap bucket comparison"
+    - "bull, bear, recession, and high-rate regimes"
+  required_metrics:
+    - "CAGR"
+    - "annualized_volatility"
+    - "Sharpe_ratio"
+    - "Sortino_ratio"
+    - "maximum_drawdown"
+    - "hit_rate"
+    - "turnover"
+    - "exposure"
+    - "trade_count"
+
+methodology_references:
+  - name: "SEC EDGAR APIs"
+    url: "https://www.sec.gov/search-filings/edgar-application-programming-interfaces"
+    purpose: "Primary filings, submissions, and XBRL Company Facts"
+  - name: "Kenneth French Data Library"
+    url: "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html"
+    purpose: "Value, profitability, investment, and market factor definitions and research data"
+  - name: "Damodaran valuation datasets"
+    url: "https://pages.stern.nyu.edu/~adamodar/pc/datacurrent.html"
+    purpose: "Industry multiples, growth, margins, risk premiums, beta, and cost-of-capital references"
+  - name: "FRED and ALFRED APIs"
+    url: "https://fred.stlouisfed.org/docs/api/fred/overview.html"
+    purpose: "Current and vintage macroeconomic inputs"
+
+disclaimer: >-
+  This configuration is for informational research and model governance. Valuation
+  involves assumptions and uncertainty, and a low valuation can reflect real business
+  risk. Results are not personalized financial advice or a guarantee of performance.
