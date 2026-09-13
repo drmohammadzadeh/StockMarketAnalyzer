@@ -1,0 +1,140 @@
+version: "1.5"
+project: "multi_agent_stock_analyzer"
+
+data_providers:
+  technical:
+    # --- Existing Professional Technical Sources ---
+    - name: "Polygon.io"
+      type: "API"
+      endpoint: "https://api.polygon.io/v2/aggs/ticker/{ticker}/range/{multiplier}/{timespan}/{from}/{to}"
+      sample_query: "https://api.polygon.io/v2/aggs/ticker/AAPL/range/1/day/2026-01-01/2026-01-31?apiKey=API_KEY"
+      parsing_sample: "Extract OHLCV array from response['results'] where 'o'=open, 'h'=high, 'l'=low, 'c'=close, 'v'=volume."
+
+    - name: "Alpha Vantage"
+      type: "API"
+      endpoint: "https://www.alphavantage.co/query?function={function}&symbol={ticker}"
+      sample_query: "https://www.alphavantage.co/query?function=RSI&symbol=AAPL&interval=daily&time_period=14&series_type=close&apikey=API_KEY"
+      parsing_sample: "Extract indicator values from response['Technical Analysis: RSI']."
+      
+    - name: "Finviz"
+      type: "Python Library / Framework"
+      endpoint: "finvizfinance.quote"
+      sample_query: "from finvizfinance.quote import finvizfinance; stock = finvizfinance('AAPL')"
+      parsing_sample: "Extract stock technicals, outer ratings, and moving averages from stock.ticker_fundament() and stock.ticker_charts()."
+
+    # --- 5 NEW Professional Technical Sources ---
+    - name: "Twelve Data"
+      type: "API"
+      endpoint: "https://api.twelvedata.com/time_series?symbol={ticker}&interval={interval}"
+      sample_query: "https://api.twelvedata.com/time_series?symbol=AAPL&interval=1day&apikey=API_KEY"
+      parsing_sample: "Parse historical OHLC data natively merged with built-in MACD/RSI parameters from response['values']."
+
+    - name: "Tiingo"
+      type: "API"
+      endpoint: "https://api.tiingo.com/tiingo/daily/{ticker}/prices"
+      sample_query: "https://api.tiingo.com/tiingo/daily/AAPL/prices?startDate=2026-01-01&token=API_KEY"
+      parsing_sample: "Extract ultra-clean, split-adjusted close (adjClose) and volume metrics for historical volatility calculations."
+
+    - name: "EODHD (EOD Historical Data)"
+      type: "API"
+      endpoint: "https://eodhd.com/api/technical/{ticker}?function={indicator}&fmt=json"
+      sample_query: "https://eodhd.com/api/technical/AAPL?function=sma&period=50&fmt=json&api_token=API_KEY"
+      parsing_sample: "Extract array of pre-computed technical indicator objects mapped chronologically by date."
+
+    - name: "TradingView (tradingview-ta)"
+      type: "Python Framework"
+      endpoint: "tradingview_ta.TA_Handler"
+      sample_query: "handler = TA_Handler(symbol='AAPL', screener='america', exchange='NASDAQ', interval=Interval.INTERVAL_1_DAY)"
+      parsing_sample: "Call handler.get_analysis().summary to extract aggregated 'BUY/SELL/NEUTRAL' signals based on 26 moving averages and oscillators."
+
+    - name: "Tradier"
+      type: "Brokerage API"
+      endpoint: "https://api.tradier.com/v1/markets/history"
+      sample_query: "GET https://api.tradier.com/v1/markets/history?symbol=AAPL&interval=daily&start=2026-01-01 (Header: Authorization: Bearer TOKEN)"
+      parsing_sample: "Iterate through response['history']['day'] for real-time integrated broker bar data to validate execution triggers."
+
+  fundamental:
+    # --- Existing Professional Fundamental Sources ---
+    - name: "GuruFocus API"
+      type: "API"
+      endpoint: "https://api.gurufocus.com/data/stocks/{ticker}/rankings"
+      sample_query: "https://api.gurufocus.com/data/stocks/AAPL/rankings?token=API_TOKEN"
+      parsing_sample: "Parse proprietary GF Score, insider trades, and long-term financial history from response."
+
+    - name: "Seeking Alpha (via RapidAPI)"
+      type: "API"
+      endpoint: "https://seeking-alpha.p.rapidapi.com/symbols/get-profile?symbol={ticker}"
+      sample_query: "GET https://seeking-alpha.p.rapidapi.com/symbols/get-profile?symbol=AAPL (Header: x-rapidapi-key: API_KEY)"
+      parsing_sample: "Extract analyst ratings, quant scores, and EPS revisions from the JSON response body."
+
+    - name: "Financial Modeling Prep (FMP)"
+      type: "API"
+      endpoint: "https://financialmodelingprep.com/api/v3/income-statement/{ticker}?period=annual"
+      sample_query: "https://financialmodelingprep.com/api/v3/income-statement/AAPL?period=annual&apikey=API_KEY"
+      parsing_sample: "Extract key fields from response[0]: ['revenue', 'grossProfit', 'netIncome', 'eps']."
+
+    # --- 5 NEW Professional Fundamental Sources ---
+    - name: "Finnhub API"
+      type: "API"
+      endpoint: "https://finnhub.io/api/v1/stock/metric?symbol={ticker}&metric=all"
+      sample_query: "https://finnhub.io/api/v1/stock/metric?symbol=AAPL&metric=all&token=API_KEY"
+      parsing_sample: "Extract response['metric'] for TTM P/E, 52-week highs/lows, Price to Book, and ROE."
+
+    - name: "SEC EDGAR API (Official Gov Data)"
+      type: "Government API"
+      endpoint: "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
+      sample_query: "GET https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json (Header: User-Agent: AppName admin@app.com)"
+      parsing_sample: "Navigate raw regulatory XBRL nodes: response['facts']['us-gaap']['NetIncomeLoss']['units']['USD']."
+
+    - name: "Morningstar (via RapidAPI)"
+      type: "API"
+      endpoint: "https://morningstar1.p.rapidapi.com/fundamentals/get-financials?identifier={ticker}"
+      sample_query: "GET https://morningstar1.p.rapidapi.com/fundamentals/get-financials?identifier=AAPL (Header: x-rapidapi-key: API_KEY)"
+      parsing_sample: "Extract deep institutional economic moat ratings, fair value estimates, and standardized historical financials."
+
+    - name: "QuickFS"
+      type: "API"
+      endpoint: "https://public-api.quickfs.net/v1/data/all-data/{ticker}"
+      sample_query: "https://public-api.quickfs.net/v1/data/all-data/AAPL?api_key=API_KEY"
+      parsing_sample: "Extract 20-year arrays of standardized financials from response['data']['financials']['annual']."
+
+    - name: "SimFin API"
+      type: "API"
+      endpoint: "https://simfin.com/api/v3/companies/statements/compact"
+      sample_query: "https://simfin.com/api/v3/companies/statements/compact?ticker=AAPL&statement=pl&period=annual&api-key=API_KEY"
+      parsing_sample: "Parse normalized income statements mapping exact GAAP accounting standards across different company reporting structures."
+
+  sentiment:
+    # --- Existing Sentiment Sources ---
+    - name: "Benzinga Pro API"
+      type: "API"
+      endpoint: "https://api.benzinga.com/api/v2/news"
+      sample_query: "https://api.benzinga.com/api/v2/news?tickers=AAPL&token=API_KEY"
+      parsing_sample: "Iterate through response['data'], extract 'title', 'body', and feed into NLP models for real-time sentiment scoring."
+
+    - name: "Blossom Social"
+      type: "Platform / Scraping"
+      endpoint: "App/Web Scraping (Community Portfolios)"
+      sample_query: "Search ticker $AAPL in Blossom feed to extract verified retail portfolio allocations."
+      parsing_sample: "Extract verified retail trades, community sentiment, and retail portfolio dividend yields."
+
+    - name: "StockTwits API"
+      type: "API"
+      endpoint: "https://api.stocktwits.com/api/2/streams/symbol/{ticker}.json"
+      sample_query: "https://api.stocktwits.com/api/2/streams/symbol/AAPL.json"
+      parsing_sample: "Iterate through response['messages'], extract text and sentiment['basic'] (Bullish/Bearish)."
+
+agent_execution_instructions:
+  data_ingestion_rules:
+    - "Dynamically substitute `{ticker}` and `{cik}` into configured endpoints utilizing environment variables or secret managers."
+    - "When hitting SEC EDGAR, strictly include a descriptive User-Agent header (Company Name / Admin Email) to avoid immediate connection rejection."
+    - "Validate data payload structure against the parsing schema before feeding downstream multi-agent analytical models."
+    - "Implement exponential backoff retry handling for HTTP status codes 429 (Rate Limit) and 5xx (Server Error), switching to secondary API tiers if primary endpoints timeout."
+    
+  data_fusion_rules:
+    - "Standardize timezone offsets to UTC across all technical OHLCV data sources before merging with fundamental quarter-end dates."
+    - "Combine institutional moat ratings from Morningstar with raw GAAP filings from SEC EDGAR to cross-verify valuation consistency."
+    - "Discard incomplete data rows where critical technical or fundamental fields return null or zero values, logging a 'missing_data_exception'."
+    
+  decision_logic_routing:
+    - "If TradingView-TA module flags 'STRONG BUY' on daily/weekly intervals, explicitly cross-reference with Seeking Alpha quant ratings and Benzinga news flow before passing the intent to the execution agent."

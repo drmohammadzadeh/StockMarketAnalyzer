@@ -1,0 +1,51 @@
+version: "1.0"
+project: "value_discovery_agent"
+strategy: "Quantitative Value & Margin of Safety"
+
+screening_rules:
+  absolute_valuation:
+    - rule: "graham_number_discount"
+      condition: "current_price < (sqrt(22.5 * trailing_eps * book_value_per_share))"
+      description: "Ensures the product of P/E (max 15) and P/B (max 1.5) does not exceed 22.5, adhering to Benjamin Graham's defensive pricing criteria."
+    - rule: "peg_ratio"
+      condition: "forward_pe / projected_5y_earnings_growth < 1.0"
+      description: "Peter Lynch's standard for Growth at a Reasonable Price (GARP)."
+    - rule: "dcf_margin_of_safety"
+      condition: "current_price <= (dcf_intrinsic_value * 0.70)"
+      description: "Requires a minimum 30% discount to the projected Discounted Cash Flow fair value."
+    - rule: "free_cash_flow_yield"
+      condition: "(free_cash_flow / enterprise_value) > 0.07"
+      description: "Yield must exceed 7%, acting as a proxy for cash-based ROI."
+
+  financial_health_and_quality:
+    - rule: "piotroski_f_score"
+      condition: "f_score >= 7"
+      description: "A 9-point checklist assessing profitability, leverage, and operating efficiency. Scores of 7-9 indicate strong, improving fundamentals."
+    - rule: "altman_z_score"
+      condition: "z_score > 2.6"
+      description: "Screens out companies with elevated bankruptcy risk within the next 24 months."
+    - rule: "debt_to_current_assets"
+      condition: "total_debt / current_assets < 1.10"
+      description: "Ensures the company is not overly leveraged relative to its short-term liquidity."
+    - rule: "current_ratio"
+      condition: "current_assets / current_liabilities > 1.50"
+      description: "Confirms the ability to cover short-term obligations easily."
+
+  profitability_and_moat:
+    - rule: "return_on_invested_capital"
+      condition: "roic > 12.0"
+      description: "Demonstrates management's efficiency at allocating capital to generate returns above the cost of capital."
+    - rule: "gross_margin_stability"
+      condition: "current_gross_margin >= average_5yr_gross_margin"
+      description: "Prevents investing in companies losing their pricing power."
+
+agent_execution_instructions:
+  screening_workflow:
+    - "Phase 1 (Universe Generation): Pull top 1,500 stocks by market cap and apply the 'absolute_valuation' and 'free_cash_flow_yield' rules to identify cheap equities."
+    - "Phase 2 (Quality Filter): Run the 'piotroski_f_score' and 'altman_z_score' rules against the Phase 1 list. Drop any stock scoring below 7 on the F-Score to ruthlessly eliminate value traps."
+    - "Phase 3 (Moat Verification): Verify 'return_on_invested_capital' and 'gross_margin_stability' using 5-year historical data via the fundamental data providers."
+
+  value_trap_avoidance:
+    - "Instant Reject: Drop any stock where the Piotroski F-score has declined by 2 or more points year-over-year, regardless of how cheap the P/E ratio appears."
+    - "Instant Reject: Drop any stock with negative Free Cash Flow in the trailing twelve months (TTM), even if net income is positive."
+    - "Data Validation: If SEC EDGAR data for total debt is missing, assume maximum leverage and reject the candidate until verified by a secondary provider."
