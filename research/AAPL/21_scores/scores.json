@@ -1,0 +1,20 @@
+{
+  "sub_scores": {
+    "fundamental": 9.2215,
+    "technical": 8.0,
+    "risk": 8.5,
+    "sentiment": 7.0,
+    "valuation": 6.5,
+    "growth": 4.0,
+    "quality": 8.0,
+    "business_strength": 9.0,
+    "management": 8.0,
+    "catalyst": 7.5,
+    "event_risk": 8.0
+  },
+  "base_ai_score": 8.34,
+  "extended_ai_score": 7.66,
+  "normalized_100_score": 81.6,
+  "confidence_score": 1.0,
+  "penalties": {}
+}

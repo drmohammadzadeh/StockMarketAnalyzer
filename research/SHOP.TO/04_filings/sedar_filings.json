@@ -1,0 +1,28 @@
+[
+  {
+    "document_type": "Annual Information Form",
+    "period": "2024-12-31",
+    "filing_date": "2025-02-15",
+    "source": "SEDAR+",
+    "jurisdiction": "Canada"
+  },
+  {
+    "document_type": "Audited Annual Financial Statements",
+    "period": "2024-12-31",
+    "filing_date": "2025-02-15",
+    "source": "SEDAR+",
+    "currency": "CAD"
+  },
+  {
+    "document_type": "Management Discussion & Analysis (MD&A)",
+    "period": "2024-12-31",
+    "filing_date": "2025-02-15",
+    "source": "SEDAR+"
+  },
+  {
+    "document_type": "Interim Financial Statements (Q1)",
+    "period": "2025-03-31",
+    "filing_date": "2025-05-10",
+    "source": "SEDAR+"
+  }
+]

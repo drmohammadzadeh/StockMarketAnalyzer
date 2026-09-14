@@ -1,0 +1,400 @@
+[
+  {
+    "timestamp_utc": "2026-09-14T06:02:03.590615+00:00",
+    "event_type": "PIPELINE_START",
+    "details": {
+      "symbol": "AAPL",
+      "horizon": "6-12 months"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:03.591438+00:00",
+    "event_type": "GATE_CHECK",
+    "details": {
+      "gate_id": "GATE_1_IDENTITY",
+      "gate_name": "Security Identity Verification",
+      "passed": true,
+      "details": "Resolved canonical ticker AAPL on NASDAQ (USD).",
+      "remedy_action": null,
+      "checked_at_utc": "2026-09-14T06:02:03.590892+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:04.652725+00:00",
+    "event_type": "GATE_CHECK",
+    "details": {
+      "gate_id": "GATE_2_MARKET_DATA",
+      "gate_name": "Historical Market Data Acquisition",
+      "passed": true,
+      "details": "Successfully acquired 252 bars of daily OHLCV trading data.",
+      "remedy_action": null,
+      "checked_at_utc": "2026-09-14T06:02:04.652059+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:07.662134+00:00",
+    "event_type": "GATE_CHECK",
+    "details": {
+      "gate_id": "GATE_3_FUNDAMENTALS",
+      "gate_name": "Primary Regulatory Filings and Statements",
+      "passed": true,
+      "details": "Essential GAAP statement concepts (Revenue, Net Income, Assets) present.",
+      "remedy_action": null,
+      "checked_at_utc": "2026-09-14T06:02:07.661060+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:07.667629+00:00",
+    "event_type": "GATE_CHECK",
+    "details": {
+      "gate_id": "GATE_4_DATA_QUALITY_VETO",
+      "gate_name": "Data Quality and Provenance Integrity",
+      "passed": true,
+      "details": "Data quality checks passed: non-negative prices, valid volume, and fresh statements.",
+      "remedy_action": null,
+      "checked_at_utc": "2026-09-14T06:02:07.665450+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:07.687808+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Fundamental Judge",
+      "target_agent": "Fundamental Research Agent",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:07.686619+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:07.690226+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Technical Judge",
+      "target_agent": "Technical Analysis Agent",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:07.686665+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:07.693555+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Risk Judge",
+      "target_agent": "Risk Analysis Agent",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:07.686729+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:07.695767+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Sentiment Judge",
+      "target_agent": "Sentiment Agent",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:07.686755+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:07.697693+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Quantitative Judge",
+      "target_agent": "Valuation / Quantitative Agent",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:07.686768+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:07.699616+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Evidence Judge",
+      "target_agent": "All Analytical Specialists",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:07.686779+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:07.701632+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Report Quality Judge",
+      "target_agent": "Delivery Manager Agent",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:07.686790+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:07.703353+00:00",
+    "event_type": "CHIEF_REVIEW",
+    "details": {
+      "passed": true,
+      "critical_defects": [],
+      "falsification_challenges": [
+        "What happens if terminal cost of capital rises 100 bps faster than anticipated?",
+        "Are consumer hardware refresh cycles extending beyond historical 3-year baselines?",
+        "Does the valuation peer group over-represent high-multiple cloud software comparables?"
+      ],
+      "unresolved_contradictions": [],
+      "confidence_penalty": 0.0,
+      "approved_for_delivery": true
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:07.707060+00:00",
+    "event_type": "PIPELINE_COMPLETE",
+    "details": {
+      "status": "COMPLETE",
+      "base_ai_score": 8.34
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:23.059524+00:00",
+    "event_type": "PIPELINE_START",
+    "details": {
+      "symbol": "AAPL",
+      "horizon": "6-12 months"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:23.060592+00:00",
+    "event_type": "GATE_CHECK",
+    "details": {
+      "gate_id": "GATE_1_IDENTITY",
+      "gate_name": "Security Identity Verification",
+      "passed": true,
+      "details": "Resolved canonical ticker AAPL on NASDAQ (USD).",
+      "remedy_action": null,
+      "checked_at_utc": "2026-09-14T06:02:23.060041+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:24.007927+00:00",
+    "event_type": "GATE_CHECK",
+    "details": {
+      "gate_id": "GATE_2_MARKET_DATA",
+      "gate_name": "Historical Market Data Acquisition",
+      "passed": true,
+      "details": "Successfully acquired 252 bars of daily OHLCV trading data.",
+      "remedy_action": null,
+      "checked_at_utc": "2026-09-14T06:02:24.007326+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:27.013761+00:00",
+    "event_type": "GATE_CHECK",
+    "details": {
+      "gate_id": "GATE_3_FUNDAMENTALS",
+      "gate_name": "Primary Regulatory Filings and Statements",
+      "passed": true,
+      "details": "Essential GAAP statement concepts (Revenue, Net Income, Assets) present.",
+      "remedy_action": null,
+      "checked_at_utc": "2026-09-14T06:02:27.012763+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:27.018345+00:00",
+    "event_type": "GATE_CHECK",
+    "details": {
+      "gate_id": "GATE_4_DATA_QUALITY_VETO",
+      "gate_name": "Data Quality and Provenance Integrity",
+      "passed": true,
+      "details": "Data quality checks passed: non-negative prices, valid volume, and fresh statements.",
+      "remedy_action": null,
+      "checked_at_utc": "2026-09-14T06:02:27.017144+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:27.029790+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Fundamental Judge",
+      "target_agent": "Fundamental Research Agent",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:27.028481+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:27.031733+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Technical Judge",
+      "target_agent": "Technical Analysis Agent",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:27.028515+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:27.033255+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Risk Judge",
+      "target_agent": "Risk Analysis Agent",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:27.028524+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:27.034708+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Sentiment Judge",
+      "target_agent": "Sentiment Agent",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:27.028531+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:27.035944+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Quantitative Judge",
+      "target_agent": "Valuation / Quantitative Agent",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:27.028536+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:27.037490+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Evidence Judge",
+      "target_agent": "All Analytical Specialists",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:27.028543+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:27.040172+00:00",
+    "event_type": "JUDGE_REVIEW",
+    "details": {
+      "judge_name": "Report Quality Judge",
+      "target_agent": "Delivery Manager Agent",
+      "passed": false,
+      "score": 4.0,
+      "objections": [
+        "Insufficient factual statements provided in specialist submission."
+      ],
+      "recommendations": [
+        "Verify latest quarter disclosures."
+      ],
+      "review_timestamp": "2026-09-14T06:02:27.028549+00:00"
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:27.042475+00:00",
+    "event_type": "CHIEF_REVIEW",
+    "details": {
+      "passed": true,
+      "critical_defects": [],
+      "falsification_challenges": [
+        "What happens if terminal cost of capital rises 100 bps faster than anticipated?",
+        "Are consumer hardware refresh cycles extending beyond historical 3-year baselines?",
+        "Does the valuation peer group over-represent high-multiple cloud software comparables?"
+      ],
+      "unresolved_contradictions": [],
+      "confidence_penalty": 0.0,
+      "approved_for_delivery": true
+    }
+  },
+  {
+    "timestamp_utc": "2026-09-14T06:02:27.045837+00:00",
+    "event_type": "PIPELINE_COMPLETE",
+    "details": {
+      "status": "COMPLETE",
+      "base_ai_score": 8.34
+    }
+  }
+]

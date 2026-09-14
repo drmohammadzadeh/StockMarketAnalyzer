@@ -1,0 +1,32 @@
+{
+  "symbol": "AAPL",
+  "company_name": "Apple Inc.",
+  "tone": 1.45,
+  "article_count": 48,
+  "sentiment_direction": "Moderately Bullish",
+  "windows": {
+    "1h": {
+      "articles": 3,
+      "avg_tone": 0.8
+    },
+    "24h": {
+      "articles": 18,
+      "avg_tone": 1.2
+    },
+    "7d": {
+      "articles": 86,
+      "avg_tone": 1.5
+    }
+  },
+  "attention_change_pct": 12.5,
+  "top_themes": [
+    "Earnings Expectations",
+    "Product Innovation",
+    "Supply Chain"
+  ],
+  "recent_headlines": [
+    "Apple Inc. Expands Core Product Ecosystem with High-Margin Services",
+    "Analyst Consensus Remains Constructive on AAPL Operating Leverage",
+    "Supply Chain Reports Indicate Steady Component Inflows for Apple Inc."
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "cik": 1594805,
+  "entityName": "SHOP.TO Inc.",
+  "facts": {
+    "us-gaap": {
+      "Revenues": {
+        "label": "Revenues",
+        "units": {
+          "USD": [
+            {
+              "val": 383285000000,
+              "fy": 2023,
+              "fp": "FY",
+              "form": "10-K"
+            },
+            {
+              "val": 391035000000,
+              "fy": 2024,
+              "fp": "FY",
+              "form": "10-K"
+            },
+            {
+              "val": 94930000000,
+              "fy": 2025,
+              "fp": "Q1",
+              "form": "10-Q"
+            }
+          ]
+        }
+      },
+      "NetIncomeLoss": {
+        "label": "Net Income",
+        "units": {
+          "USD": [
+            {
+              "val": 96995000000,
+              "fy": 2023,
+              "fp": "FY",
+              "form": "10-K"
+            },
+            {
+              "val": 93736000000,
+              "fy": 2024,
+              "fp": "FY",
+              "form": "10-K"
+            },
+            {
+              "val": 36330000000,
+              "fy": 2025,
+              "fp": "Q1",
+              "form": "10-Q"
+            }
+          ]
+        }
+      },
+      "Assets": {
+        "label": "Assets",
+        "units": {
+          "USD": [
+            {
+              "val": 352583000000,
+              "fy": 2023,
+              "fp": "FY",
+              "form": "10-K"
+            },
+            {
+              "val": 364980000000,
+              "fy": 2024,
+              "fp": "FY",
+              "form": "10-K"
+            }
+          ]
+        }
+      },
+      "LongTermDebt": {
+        "label": "Long-term Debt",
+        "units": {
+          "USD": [
+            {
+              "val": 95281000000,
+              "fy": 2023,
+              "fp": "FY",
+              "form": "10-K"
+            },
+            {
+              "val": 85750000000,
+              "fy": 2024,
+              "fp": "FY",
+              "form": "10-K"
+            }
+          ]
+        }
+      },
+      "NetCashProvidedByUsedInOperatingActivities": {
+        "label": "Operating Cash Flow",
+        "units": {
+          "USD": [
+            {
+              "val": 110543000000,
+              "fy": 2023,
+              "fp": "FY",
+              "form": "10-K"
+            },
+            {
+              "val": 118265000000,
+              "fy": 2024,
+              "fp": "FY",
+              "form": "10-K"
+            }
+          ]
+        }
+      },
+      "PaymentsToAcquirePropertyPlantAndEquipment": {
+        "label": "Capital Expenditures",
+        "units": {
+          "USD": [
+            {
+              "val": 10959000000,
+              "fy": 2023,
+              "fp": "FY",
+              "form": "10-K"
+            },
+            {
+              "val": 9450000000,
+              "fy": 2024,
+              "fp": "FY",
+              "form": "10-K"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

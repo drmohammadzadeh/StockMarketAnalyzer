@@ -1,0 +1,17 @@
+{
+  "canonical_ticker": "SHOP.TO",
+  "exchange": "TSX",
+  "country": "CA",
+  "currency": "CAD",
+  "company_name": "Shopify Inc.",
+  "cik": "0001594805",
+  "figi": null,
+  "isin": null,
+  "cusip": null,
+  "primary_listing": true,
+  "cross_listed_ticker": "SHOP",
+  "cross_listed_exchange": "NYSE",
+  "asset_type": "stock",
+  "sector": "Technology",
+  "industry": "Software\u2014Infrastructure"
+}

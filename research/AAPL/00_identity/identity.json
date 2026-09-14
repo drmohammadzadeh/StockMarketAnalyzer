@@ -1,0 +1,17 @@
+{
+  "canonical_ticker": "AAPL",
+  "exchange": "NASDAQ",
+  "country": "US",
+  "currency": "USD",
+  "company_name": "Apple Inc.",
+  "cik": "0000320193",
+  "figi": "BBG000B9XRY4",
+  "isin": "US0378331005",
+  "cusip": null,
+  "primary_listing": true,
+  "cross_listed_ticker": null,
+  "cross_listed_exchange": null,
+  "asset_type": "stock",
+  "sector": "Technology",
+  "industry": "Consumer Electronics"
+}

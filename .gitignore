@@ -33,9 +33,7 @@ htmlcov/
 .mypy_cache/
 .ruff_cache/
 
-# Analytical Parquet Data & Generated Research Artifacts
-research/
-*.parquet
+# Temporary Database & Scratch Data
 *.csv
 *.db
 *.duckdb
