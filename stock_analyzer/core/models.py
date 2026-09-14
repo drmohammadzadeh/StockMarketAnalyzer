@@ -1,6 +1,4 @@
-"""Pydantic data models for the multi-agent equity research platform."""
-
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, Field
 
@@ -76,7 +74,7 @@ class JudgeReview(BaseModel):
     score: float = 10.0  # 1.0 to 10.0 scale
     objections: List[str] = Field(default_factory=list)
     recommendations: List[str] = Field(default_factory=list)
-    review_timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    review_timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
 class ChiefReviewOutput(BaseModel):
@@ -106,4 +104,4 @@ class GateResult(BaseModel):
     passed: bool
     details: str
     remedy_action: Optional[str] = None
-    checked_at_utc: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    checked_at_utc: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
