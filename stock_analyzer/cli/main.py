@@ -36,19 +36,12 @@ def run_cli():
     ))
 
     orchestrator = ResearchOrchestrator()
-
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        console=console,
-    ) as progress:
-        task = progress.add_task(f"[cyan]Executing 8-Phase Gated Pipeline for {symbol}...", total=None)
-        result = asyncio.run(orchestrator.run(symbol, horizon=args.horizon))
-        progress.update(task, completed=True)
+    console.print(f"[cyan]Executing 8-Phase Gated Pipeline for {symbol}...[/cyan]")
+    result = asyncio.run(orchestrator.run(symbol, horizon=args.horizon))
 
     if result.get("status") == "COMPLETE":
         scores = result["scores"]
-        console.print("\n[bold green]✓ Research Pipeline Completed Successfully! (All 12 Gates Passed)[/bold green]\n")
+        console.print("\n[bold green][PASS] Research Pipeline Completed Successfully! (All 12 Gates Passed)[/bold green]\n")
 
         # Scorecard Table
         table = Table(title=f"Institutional AI Scorecard — {result['company_name']} ({result['symbol']})")
