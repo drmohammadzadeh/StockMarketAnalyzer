@@ -4,6 +4,9 @@ import json
 import os
 from typing import Any, Dict, Optional
 from stock_analyzer.core.models import AgentOutput
+from stock_analyzer.core.config import load_dotenv
+
+load_dotenv()
 
 
 class BaseAgent:
@@ -14,7 +17,7 @@ class BaseAgent:
         name: str,
         role: str,
         system_instructions: str = "",
-        model_name: str = "gemini-2.5-flash",
+        model_name: str = "gemini-3.8-flash",
     ):
         self.name = name
         self.role = role
@@ -31,10 +34,11 @@ class BaseAgent:
         return (
             f"Agent: {self.name}\n"
             f"Role: {self.role}\n"
+            f"Instructions: {self.system_instructions}\n"
             f"Context Data:\n{json.dumps(context, default=str, indent=2)}\n\n"
             "Produce structured JSON with fields: summary, facts (list of strings), "
             "calculations (dict), inferences (list of strings), uncertainties (list of strings), "
-            "citations (list of strings), confidence (float between 0.0 and 1.0)."
+            "data_gaps (list of strings), citations (list of strings), confidence (float between 0.0 and 1.0)."
         )
 
     async def run(self, context: Dict[str, Any]) -> AgentOutput:
@@ -42,37 +46,44 @@ class BaseAgent:
         Execute analysis using Gemini Flash 3.8 if API key is configured,
         otherwise execute deterministic offline rule-based reasoning.
         """
-        if self.api_key:
-            try:
-                from google import genai
-                client = genai.Client(api_key=self.api_key)
-                prompt = self.build_prompt(context)
-                response = client.models.generate_content(
-                    model=self.model_name,
-                    contents=prompt,
-                )
-                text = response.text or ""
-                # Parse JSON block if enclosed in markdown backticks
-                if "```json" in text:
-                    text = text.split("```json")[1].split("```")[0].strip()
-                elif "```" in text:
-                    text = text.split("```")[1].split("```")[0].strip()
-                parsed = json.loads(text)
-                return AgentOutput(
-                    agent_name=self.name,
-                    status="COMPLETED",
-                    summary=parsed.get("summary", ""),
-                    facts=parsed.get("facts", []),
-                    calculations=parsed.get("calculations", {}),
-                    inferences=parsed.get("inferences", []),
-                    uncertainties=parsed.get("uncertainties", []),
-                    data_gaps=parsed.get("data_gaps", []),
-                    citations=parsed.get("citations", []),
-                    confidence=float(parsed.get("confidence", 0.90)),
-                )
-            except Exception:
-                # Graceful degradation to deterministic mock
-                pass
+        api_key = self.api_key or os.environ.get("GEMINI_API_KEY", "")
+        if api_key:
+            from google import genai
+            client = genai.Client(api_key=api_key)
+            prompt = self.build_prompt(context)
+            
+            # Try primary model (gemini-3.8-flash), then fallback (gemini-3.5-flash-lite)
+            candidate_models = [self.model_name]
+            if self.model_name != "gemini-3.5-flash-lite":
+                candidate_models.append("gemini-3.5-flash-lite")
+
+            for model in candidate_models:
+                try:
+                    response = client.models.generate_content(
+                        model=model,
+                        contents=prompt,
+                        config={"response_mime_type": "application/json"},
+                    )
+                    text = response.text or ""
+                    if "```json" in text:
+                        text = text.split("```json")[1].split("```")[0].strip()
+                    elif "```" in text:
+                        text = text.split("```")[1].split("```")[0].strip()
+                    parsed = json.loads(text)
+                    return AgentOutput(
+                        agent_name=self.name,
+                        status="COMPLETED",
+                        summary=parsed.get("summary", f"{self.name} completed evaluation."),
+                        facts=parsed.get("facts", []),
+                        calculations=parsed.get("calculations", {}),
+                        inferences=parsed.get("inferences", []),
+                        uncertainties=parsed.get("uncertainties", []),
+                        data_gaps=parsed.get("data_gaps", []),
+                        citations=parsed.get("citations", ["Primary Regulatory Filings / Market Data"]),
+                        confidence=float(parsed.get("confidence", 0.90)),
+                    )
+                except Exception:
+                    continue
 
         # Deterministic offline reasoning fallback
         return self._run_offline_mock(context)

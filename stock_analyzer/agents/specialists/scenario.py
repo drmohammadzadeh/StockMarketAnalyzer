@@ -12,6 +12,11 @@ class ScenarioAgent(BaseAgent):
         super().__init__(
             name="Scenario Analysis Agent",
             role="Formulate Bull, Base, Bear, and Stress investment scenarios with invalidation criteria.",
+            system_instructions=(
+                "You are the Scenario Analysis Agent. You must formulate four explicit investment scenarios: "
+                "Bull Case, Base Case, Bear Case, and Stress Case with target estimates and invalidation criteria. "
+                "Explicitly include 'Bull Case', 'Base Case', 'Bear Case', and 'Stress Case' in your facts or inferences."
+            ),
         )
 
     def _run_offline_mock(self, context: Dict[str, Any]) -> AgentOutput:

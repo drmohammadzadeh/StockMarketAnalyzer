@@ -7,6 +7,37 @@ import yaml
 from pydantic import BaseModel, Field
 
 
+def load_dotenv(env_path: Optional[Path] = None) -> None:
+    """Loads environment variables from .env file into os.environ."""
+    if env_path is None:
+        root = Path(__file__).resolve().parent.parent.parent
+        env_path = root / ".env"
+    if env_path.exists():
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                k, v = line.split("=", 1)
+                k = k.strip()
+                v = v.strip().strip("'\"")
+                if k and k not in os.environ:
+                    os.environ[k] = v
+
+
+def sanitize_network_environment() -> None:
+    """Ensure invalid system proxy configurations (e.g. broken Windows registry ':' proxy) do not crash HTTP clients."""
+    for var in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy"):
+        val = os.environ.get(var, "")
+        if val in (":", "http://:", "https://:", "http://:0"):
+            os.environ.pop(var, None)
+
+
+# Auto-load on import
+load_dotenv()
+sanitize_network_environment()
+
+
 class SourceDefinition(BaseModel):
     """Metadata and capability definition for a registered data provider."""
     id: str
