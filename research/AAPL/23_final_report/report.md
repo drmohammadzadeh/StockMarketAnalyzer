@@ -1,6 +1,6 @@
 # Apple Inc. (AAPL) — AI Equity Research Report
 
-**Analysis Timestamp**: 2026-09-14 06:02 UTC  
+**Analysis Timestamp**: 2026-09-14 06:32 UTC  
 **Investment Horizon**: 6-12 months  
 **Platform Status**: COMPLETE (All 12 Gates Passed)
 
@@ -122,9 +122,9 @@ Apple Inc. remains an elite, highly profitable enterprise with superior capital 
 ## 17. Sources
 | Provider | Dataset / Endpoint | Retrieved At (UTC) | Role in Analysis | Reference |
 | :--- | :--- | :--- | :--- | :--- |
-| `open_market` | `v8/finance/chart` | `2026-09-14T06:02:23.996456+00:00` | Primary Evidence | [Link](https://finance.yahoo.com/quote/AAPL) |
-| `sec_edgar` | `api/xbrl/companyfacts` | `2026-09-14T06:02:27.012048+00:00` | Primary Evidence | [Link](https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json) |
-| `gdelt` | `doc/doc` | `2026-09-14T06:02:27.015836+00:00` | Primary Evidence | [Link](https://www.gdeltproject.org/) |
+| `open_market` | `v8/finance/chart` | `2026-09-14T06:29:59.959544+00:00` | Primary Evidence | [Link](https://finance.yahoo.com/quote/AAPL) |
+| `sec_edgar` | `api/xbrl/companyfacts` | `2026-09-14T06:30:02.975340+00:00` | Primary Evidence | [Link](https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json) |
+| `gdelt` | `doc/doc` | `2026-09-14T06:30:02.977790+00:00` | Primary Evidence | [Link](https://www.gdeltproject.org/) |
 
 ---
 
