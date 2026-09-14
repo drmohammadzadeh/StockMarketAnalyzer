@@ -19,6 +19,7 @@ async def test_pipeline_orchestrator_execution(tmp_path):
     aapl_dir = tmp_path / "AAPL"
     assert (aapl_dir / "00_identity").exists()
     assert (aapl_dir / "02_normalized_market_data").exists()
+    assert (aapl_dir / "README.md").exists()
     assert (aapl_dir / "23_final_report" / "report.md").exists()
     assert (aapl_dir / "23_final_report" / "plain_english.md").exists()
     assert (aapl_dir / "24_audit" / "audit_log.json").exists()
@@ -30,3 +31,4 @@ async def test_canadian_security_pipeline(tmp_path):
     assert result["status"] == "COMPLETE"
     assert result["symbol"] == "SHOP.TO"
     assert result["currency"] == "CAD"
+    assert (tmp_path / "SHOP.TO" / "README.md").exists()

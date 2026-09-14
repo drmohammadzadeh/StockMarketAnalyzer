@@ -302,12 +302,25 @@ class ResearchOrchestrator:
             horizon=horizon,
         )
 
+        readme_md = self.delivery_manager.generate_readme_summary(
+            symbol=clean_symbol,
+            company_name=identity.company_name,
+            scores=scores,
+            specialist_outputs=specialist_outputs,
+            horizon=horizon,
+        )
+
         with open(Path(dirs["23_final_report"]) / "report.md", "w", encoding="utf-8") as f:
             f.write(report_md)
         with open(Path(dirs["23_final_report"]) / "plain_english.md", "w", encoding="utf-8") as f:
             f.write(plain_md)
         with open(Path(dirs["23_final_report"]) / "report.json", "w", encoding="utf-8") as f:
             json.dump(report_json, f, indent=2)
+
+        # Save executive summary README.md in root stock folder
+        symbol_root_dir = self.storage.get_symbol_dir(clean_symbol)
+        with open(symbol_root_dir / "README.md", "w", encoding="utf-8") as f:
+            f.write(readme_md)
 
         audit.log_event("PIPELINE_COMPLETE", {"status": "COMPLETE", "base_ai_score": scores.base_ai_score})
 
@@ -317,6 +330,7 @@ class ResearchOrchestrator:
             "company_name": identity.company_name,
             "currency": identity.currency,
             "scores": scores,
+            "readme_path": str(symbol_root_dir / "README.md"),
             "report_path": str(Path(dirs["23_final_report"]) / "report.md"),
             "plain_english_path": str(Path(dirs["23_final_report"]) / "plain_english.md"),
         }

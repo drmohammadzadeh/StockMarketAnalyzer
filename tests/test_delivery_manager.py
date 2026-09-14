@@ -74,3 +74,17 @@ def test_report_generation():
     # 3. Check JSON structure
     assert report_json["symbol"] == "AAPL"
     assert report_json["base_ai_score"] == 7.70
+
+    # 4. Check Root README Summary with visual charts and diagrams
+    readme_md = manager.generate_readme_summary(
+        symbol="AAPL",
+        company_name="Apple Inc.",
+        scores=scores,
+        specialist_outputs={},
+    )
+    assert "# Apple Inc. (AAPL) — Research Overview & Executive Dashboard" in readme_md
+    assert "## ⚡ At-a-Glance Executive Summary" in readme_md
+    assert "## 📊 Visual Multi-Dimensional Scorecard" in readme_md
+    assert "```mermaid" in readme_md
+    assert "graph LR" in readme_md
+    assert "## 📁 Research Artifacts & Subdirectories" in readme_md
