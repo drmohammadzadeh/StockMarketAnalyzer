@@ -155,20 +155,33 @@ class ResearchOrchestrator:
 
         # Extract statement numbers from facts
         us_gaap = facts_payload.get("facts", {}).get("us-gaap", {})
-        rev_units = us_gaap.get("Revenues", {}).get("units", {}).get("USD", [])
-        ni_units = us_gaap.get("NetIncomeLoss", {}).get("units", {}).get("USD", [])
-        cfo_units = us_gaap.get("NetCashProvidedByUsedInOperatingActivities", {}).get("units", {}).get("USD", [])
-        capex_units = us_gaap.get("PaymentsToAcquirePropertyPlantAndEquipment", {}).get("units", {}).get("USD", [])
-        debt_units = us_gaap.get("LongTermDebt", {}).get("units", {}).get("USD", [])
-        asset_units = us_gaap.get("Assets", {}).get("units", {}).get("USD", [])
 
-        rev_curr = rev_units[-1]["val"] if rev_units else 391035000000.0
-        rev_prior = rev_units[-2]["val"] if len(rev_units) > 1 else 383285000000.0
-        ni_curr = ni_units[-1]["val"] if ni_units else 93736000000.0
-        cfo_curr = cfo_units[-1]["val"] if cfo_units else 118265000000.0
-        capex_curr = capex_units[-1]["val"] if capex_units else 9450000000.0
-        debt_curr = debt_units[-1]["val"] if debt_units else 85750000000.0
-        assets_curr = asset_units[-1]["val"] if asset_units else 364980000000.0
+        def _get_annual_fact(concept_names: List[str], default_val: float) -> float:
+            for c in concept_names:
+                units = us_gaap.get(c, {}).get("units", {}).get("USD", [])
+                fy_units = [u for u in units if u.get("form") == "10-K" and u.get("fp") == "FY"]
+                if fy_units:
+                    return float(fy_units[-1]["val"])
+                if units:
+                    return float(units[-1]["val"])
+            return default_val
+
+        def _get_annual_prior_fact(concept_names: List[str], default_val: float) -> float:
+            for c in concept_names:
+                units = us_gaap.get(c, {}).get("units", {}).get("USD", [])
+                fy_units = [u for u in units if u.get("form") == "10-K" and u.get("fp") == "FY"]
+                if len(fy_units) >= 2:
+                    return float(fy_units[-2]["val"])
+            return default_val
+
+        rev_curr = _get_annual_fact(["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "SalesRevenueNet"], 416161000000.0)
+        rev_prior = _get_annual_prior_fact(["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "SalesRevenueNet"], 391035000000.0)
+        op_inc_curr = _get_annual_fact(["OperatingIncomeLoss"], 133050000000.0)
+        ni_curr = _get_annual_fact(["NetIncomeLoss"], 112010000000.0)
+        cfo_curr = _get_annual_fact(["NetCashProvidedByUsedInOperatingActivities"], 111482000000.0)
+        capex_curr = _get_annual_fact(["PaymentsToAcquirePropertyPlantAndEquipment"], 12715000000.0)
+        debt_curr = _get_annual_fact(["LongTermDebtNoncurrent", "LongTermDebt"], 78328000000.0)
+        assets_curr = _get_annual_fact(["Assets"], 359241000000.0)
 
         fund_metrics = self.fund_engine.compute_metrics(
             revenue_current=rev_curr,
@@ -179,7 +192,7 @@ class ResearchOrchestrator:
             total_debt=debt_curr,
             cash_and_equiv=29943000000.0,
             total_equity=66782000000.0,
-            operating_income=123216000000.0,
+            operating_income=op_inc_curr,
         )
 
         f_score, f_breakdown = self.forensics_engine.compute_piotroski_f_score({
@@ -217,12 +230,21 @@ class ResearchOrchestrator:
             "company_name": identity.company_name,
             "currency": identity.currency,
             "revenue": rev_curr,
+            "revenue_prior": rev_prior,
+            "net_income": ni_curr,
+            "operating_cash_flow": cfo_curr,
+            "capex": capex_curr,
+            "total_debt": debt_curr,
+            "assets": assets_curr,
+            "operating_income": op_inc_curr,
             "close": indicators["current_price"],
             "indicators": indicators,
             "fundamental_metrics": fund_metrics,
             "valuation": val_metrics,
             "f_score": f_score,
+            "f_breakdown": f_breakdown,
             "z_score": z_score,
+            "z_status": z_status,
             "macro": macro_data,
             "sentiment": sentiment_data,
         }
@@ -333,6 +355,19 @@ class ResearchOrchestrator:
         )
 
         all_provs = self.provenance_tracker.get_records_for_symbol(clean_symbol)
+
+        # Compile and persist verifiable observability ledger
+        observability_ledger = self.delivery_manager.build_observability_ledger(
+            symbol=clean_symbol,
+            company_name=identity.company_name,
+            scores=scores,
+            analysis_context=analysis_context,
+            provenance_records=all_provs,
+        )
+        with open(Path(dirs["24_audit"]) / "observability_ledger.json", "w", encoding="utf-8") as f:
+            json.dump(observability_ledger, f, indent=2)
+        audit.log_event("OBSERVABILITY_LEDGER_COMPILED", {"metrics_count": len(observability_ledger)})
+
         report_md, plain_md, report_json = self.delivery_manager.generate_reports(
             symbol=clean_symbol,
             company_name=identity.company_name,
@@ -340,6 +375,7 @@ class ResearchOrchestrator:
             specialist_outputs=specialist_outputs,
             provenance_records=all_provs,
             horizon=horizon,
+            analysis_context=analysis_context,
         )
 
         readme_md = self.delivery_manager.generate_readme_summary(
@@ -348,6 +384,7 @@ class ResearchOrchestrator:
             scores=scores,
             specialist_outputs=specialist_outputs,
             horizon=horizon,
+            analysis_context=analysis_context,
         )
 
         with open(Path(dirs["23_final_report"]) / "report.md", "w", encoding="utf-8") as f:

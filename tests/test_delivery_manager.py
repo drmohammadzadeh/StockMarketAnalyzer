@@ -64,6 +64,9 @@ def test_report_generation():
     assert "## 16. Final Assessment" in report_md
     assert "## 17. Sources" in report_md
     assert "## 18. Disclaimer" in report_md
+    assert "### Verifiable Fundamental Derivations" in report_md
+    assert "### Verifiable Valuation Model Inputs" in report_md
+    assert "### Master Observability Ledger" in report_md
 
     # 2. Check Plain English summary
     assert "## In Plain English" in plain_md
@@ -74,6 +77,8 @@ def test_report_generation():
     # 3. Check JSON structure
     assert report_json["symbol"] == "AAPL"
     assert report_json["base_ai_score"] == 7.70
+    assert "observability_ledger" in report_json
+    assert len(report_json["observability_ledger"]) >= 10
 
     # 4. Check Root README Summary with visual charts and diagrams
     readme_md = manager.generate_readme_summary(
@@ -85,6 +90,7 @@ def test_report_generation():
     assert "# Apple Inc. (AAPL) — Research Overview & Executive Dashboard" in readme_md
     assert "## ⚡ At-a-Glance Executive Summary" in readme_md
     assert "## 📊 Visual Multi-Dimensional Scorecard" in readme_md
+    assert "## 🔍 Verifiable Evidence & Calculation Proof Ledger" in readme_md
     assert "```mermaid" in readme_md
     assert "graph LR" in readme_md
     assert "## 📁 Research Artifacts & Subdirectories" in readme_md
