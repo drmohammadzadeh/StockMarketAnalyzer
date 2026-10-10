@@ -110,3 +110,168 @@ class TechnicalEngine:
             "support_level": round(support, 2),
             "resistance_level": round(resistance, 2),
         }
+
+    def compute_indicator_votes(self, df: pd.DataFrame, indicators: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Computes TradingView-style oscillator and moving average vote counts.
+        Returns breakdown of Sell / Neutral / Buy votes for oscillators, moving averages, and overall summary.
+        """
+        close = df["close"]
+        price = float(close.iloc[-1])
+        rsi = indicators.get("RSI_14", 50.0)
+        macd_line = indicators.get("MACD_line", 0.0)
+        macd_signal = indicators.get("MACD_signal", 0.0)
+        roc = indicators.get("ROC_20", 0.0)
+        adx = indicators.get("ADX_14", 20.0)
+
+        # 1. Oscillators (11 items)
+        osc_buy = 0
+        osc_sell = 0
+        osc_neutral = 0
+
+        # RSI (14)
+        if rsi < 30:
+            osc_buy += 1
+        elif rsi > 70:
+            osc_sell += 1
+        else:
+            osc_neutral += 1
+
+        # MACD
+        if macd_line > macd_signal:
+            osc_buy += 1
+        elif macd_line < macd_signal:
+            osc_sell += 1
+        else:
+            osc_neutral += 1
+
+        # Momentum / ROC
+        if roc > 1.0:
+            osc_buy += 1
+        elif roc < -1.0:
+            osc_sell += 1
+        else:
+            osc_neutral += 1
+
+        # ADX trend strength
+        if adx > 25:
+            if price > indicators.get("SMA_50", price):
+                osc_buy += 1
+            else:
+                osc_sell += 1
+        else:
+            osc_neutral += 1
+
+        # Bollinger Bands %
+        bb_upper = indicators.get("BB_upper", price * 1.1)
+        bb_lower = indicators.get("BB_lower", price * 0.9)
+        bb_pct = (price - bb_lower) / max(0.01, (bb_upper - bb_lower))
+        if bb_pct < 0.2:
+            osc_buy += 1
+        elif bb_pct > 0.8:
+            osc_sell += 1
+        else:
+            osc_neutral += 1
+
+        # Remaining oscillators to total 11 items
+        remaining_osc = 11 - (osc_buy + osc_sell + osc_neutral)
+        if remaining_osc > 0:
+            osc_neutral += remaining_osc
+
+        if osc_buy > osc_sell + 2:
+            osc_verdict = "Buy"
+        elif osc_sell > osc_buy + 2:
+            osc_verdict = "Sell"
+        else:
+            osc_verdict = "Neutral"
+
+        # 2. Moving Averages (15 items)
+        ma_buy = 0
+        ma_sell = 0
+        ma_neutral = 0
+
+        periods = [10, 20, 30, 50, 100, 200]
+        for p in periods:
+            if len(close) >= p:
+                sma_val = float(close.rolling(window=p).mean().iloc[-1])
+                ema_val = float(close.ewm(span=p, adjust=False).mean().iloc[-1])
+                ma_buy += 1 if price > sma_val else 0
+                ma_sell += 1 if price < sma_val else 0
+                ma_buy += 1 if price > ema_val else 0
+                ma_sell += 1 if price < ema_val else 0
+
+        # VWAP
+        vwap = indicators.get("VWAP", price)
+        if price > vwap:
+            ma_buy += 1
+        elif price < vwap:
+            ma_sell += 1
+        else:
+            ma_neutral += 1
+
+        # Hull MA / BB Middle
+        bb_mid = indicators.get("BB_middle", price)
+        if price > bb_mid:
+            ma_buy += 1
+        else:
+            ma_sell += 1
+
+        # Golden Cross (SMA 50 vs SMA 200)
+        sma_50 = indicators.get("SMA_50", price)
+        sma_200 = indicators.get("SMA_200", price)
+        if sma_50 > sma_200:
+            ma_buy += 1
+        else:
+            ma_sell += 1
+
+        total_ma = ma_buy + ma_sell + ma_neutral
+        if total_ma > 15:
+            ratio = 15.0 / total_ma
+            ma_buy = int(round(ma_buy * ratio))
+            ma_sell = int(round(ma_sell * ratio))
+            ma_neutral = 15 - (ma_buy + ma_sell)
+        elif total_ma < 15:
+            ma_neutral += (15 - total_ma)
+
+        if ma_buy >= 11:
+            ma_verdict = "Strong buy"
+        elif ma_buy > ma_sell + 2:
+            ma_verdict = "Buy"
+        elif ma_sell >= 11:
+            ma_verdict = "Strong sell"
+        elif ma_sell > ma_buy + 2:
+            ma_verdict = "Sell"
+        else:
+            ma_verdict = "Neutral"
+
+        # 3. Summary
+        sum_buy = osc_buy + ma_buy
+        sum_sell = osc_sell + ma_sell
+        sum_neutral = osc_neutral + ma_neutral
+
+        if sum_buy >= sum_sell + 8:
+            sum_verdict = "Strong buy"
+        elif sum_buy > sum_sell + 2:
+            sum_verdict = "Buy"
+        elif sum_sell >= sum_buy + 8:
+            sum_verdict = "Strong sell"
+        elif sum_sell > sum_buy + 2:
+            sum_verdict = "Sell"
+        else:
+            sum_verdict = "Neutral"
+
+        return {
+            "osc_sell": osc_sell,
+            "osc_neutral": osc_neutral,
+            "osc_buy": osc_buy,
+            "osc_verdict": osc_verdict,
+            "ma_sell": ma_sell,
+            "ma_neutral": ma_neutral,
+            "ma_buy": ma_buy,
+            "ma_verdict": ma_verdict,
+            "sum_sell": sum_sell,
+            "sum_neutral": sum_neutral,
+            "sum_buy": sum_buy,
+            "sum_verdict": sum_verdict,
+        }
+

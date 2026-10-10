@@ -80,6 +80,10 @@ class DeliveryManager:
 | **Event Risk** | **{ev_risk_s:.1f}** | Negligible near-term binary operational threats. |
 | **AI Score (Composite)** | **{scores.base_ai_score:.1f}** | $0.40 \\times \\text{{Fund}} + 0.35 \\times \\text{{Tech}} + 0.15 \\times \\text{{Sent}} + 0.10 \\times \\text{{Macro}}$ |
 
+<p align="center">
+  <img src="../assets/radar_score_chart.png" alt="Performance Pentagon" width="480" />
+</p>
+
 ---
 
 ## 3. Company Overview
@@ -105,6 +109,10 @@ class DeliveryManager:
 * **Moving Averages**: Current price trades above both the 50-day and 200-day simple moving averages.
 * **Momentum**: 14-day RSI remains in the constructive neutral zone without overbought exhaustion.
 * **Key Levels**: Intermediate support identified at local swing lows with defined resistance overhead.
+
+<p align="center">
+  <img src="../assets/technical_gauges.png" alt="Technical Summary Gauges" width="750" />
+</p>
 
 ---
 
@@ -325,6 +333,18 @@ Event Risk         {ev_risk_s:4.1f}/10  [{_meter(ev_risk_s)}]  {"🟢 Benign" if
 -------------------------------------------------------
 COMPOSITE AI SCORE {scores.base_ai_score:4.1f}/10  [{_meter(scores.base_ai_score)}]  {verdict_badge}
 ```
+
+---
+
+## 🎯 Visual Multi-Dimensional Radar & Technical Gauges
+
+<p align="center">
+  <img src="./assets/radar_score_chart.png" alt="Multi-Dimensional Performance Pentagon" width="480" />
+</p>
+
+<p align="center">
+  <img src="./assets/technical_gauges.png" alt="Technical Indicators Summary Gauges" width="750" />
+</p>
 
 ---
 

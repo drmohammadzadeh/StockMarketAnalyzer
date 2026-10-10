@@ -1,6 +1,6 @@
 # Apple Inc. (AAPL) — AI Equity Research Report
 
-**Analysis Timestamp**: 2026-09-14 06:32 UTC  
+**Analysis Timestamp**: 2026-10-10 10:53 UTC  
 **Investment Horizon**: 6-12 months  
 **Platform Status**: COMPLETE (All 12 Gates Passed)
 
@@ -10,7 +10,7 @@
 Apple Inc. (AAPL) represents a high-quality market leader characterized by exceptional capital allocation, robust free cash flow generation, and durable competitive moats.
 * **Main Bullish Arguments**: High return on invested capital (>30%), expanding services ecosystem margin contribution, and substantial share buyback programs.
 * **Main Bearish Arguments**: Premium valuation relative to broader equities and potential international regulatory scrutiny on platform fees.
-* **Final AI Score**: **8.3 / 10.0** (81.6 / 100)  
+* **Final AI Score**: **8.4 / 10.0** (82.1 / 100)  
 * **Confidence Score**: **1.00 / 1.00**  
 * **Overall Research View**: Moderately Bullish over a 6-12 months horizon.
 
@@ -20,7 +20,7 @@ Apple Inc. (AAPL) represents a high-quality market leader characterized by excep
 
 | Score | 1–10 | Key Drivers / Summary |
 | :--- | ---: | :--- |
-| **Fundamental** | **9.2** | Exceptional cash conversion, resilient operating margins. |
+| **Fundamental** | **9.3** | Exceptional cash conversion, resilient operating margins. |
 | **Technical** | **8.0** | Defined intermediate uptrend, 50 SMA above 200 SMA. |
 | **Risk** | **8.5** | Safe Zone Altman Z, low leverage, pristine liquidity. |
 | **Sentiment** | **7.0** | Positive news tone (+1.45), steady attention volume. |
@@ -31,7 +31,11 @@ Apple Inc. (AAPL) represents a high-quality market leader characterized by excep
 | **Management** | **8.0** | Consistent shareholder-friendly capital returns. |
 | **Catalyst** | **7.5** | Product release cycles and expanding recurring services. |
 | **Event Risk** | **8.0** | Negligible near-term binary operational threats. |
-| **AI Score (Composite)** | **8.3** | $0.40 \times \text{Fund} + 0.35 \times \text{Tech} + 0.15 \times \text{Sent} + 0.10 \times \text{Macro}$ |
+| **AI Score (Composite)** | **8.4** | $0.40 \times \text{Fund} + 0.35 \times \text{Tech} + 0.15 \times \text{Sent} + 0.10 \times \text{Macro}$ |
+
+<p align="center">
+  <img src="../assets/radar_score_chart.png" alt="Performance Pentagon" width="480" />
+</p>
 
 ---
 
@@ -58,6 +62,10 @@ Apple Inc. designs, manufactures, and markets consumer technology hardware, oper
 * **Moving Averages**: Current price trades above both the 50-day and 200-day simple moving averages.
 * **Momentum**: 14-day RSI remains in the constructive neutral zone without overbought exhaustion.
 * **Key Levels**: Intermediate support identified at local swing lows with defined resistance overhead.
+
+<p align="center">
+  <img src="../assets/technical_gauges.png" alt="Technical Summary Gauges" width="750" />
+</p>
 
 ---
 
@@ -115,16 +123,16 @@ Steady single-digit revenue expansion, stable operating margins, and ongoing sha
 ---
 
 ## 16. Final Assessment
-Apple Inc. remains an elite, highly profitable enterprise with superior capital efficiency. The Base AI Score of **8.3/10** with a high Confidence Score of **1.00** reflects robust data integrity and strong business fundamentals.
+Apple Inc. remains an elite, highly profitable enterprise with superior capital efficiency. The Base AI Score of **8.4/10** with a high Confidence Score of **1.00** reflects robust data integrity and strong business fundamentals.
 
 ---
 
 ## 17. Sources
 | Provider | Dataset / Endpoint | Retrieved At (UTC) | Role in Analysis | Reference |
 | :--- | :--- | :--- | :--- | :--- |
-| `open_market` | `v8/finance/chart` | `2026-09-14T06:29:59.959544+00:00` | Primary Evidence | [Link](https://finance.yahoo.com/quote/AAPL) |
-| `sec_edgar` | `api/xbrl/companyfacts` | `2026-09-14T06:30:02.975340+00:00` | Primary Evidence | [Link](https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json) |
-| `gdelt` | `doc/doc` | `2026-09-14T06:30:02.977790+00:00` | Primary Evidence | [Link](https://www.gdeltproject.org/) |
+| `open_market` | `v8/finance/chart` | `2026-10-10T10:53:37.648057+00:00` | Primary Evidence | [Link](https://finance.yahoo.com/quote/AAPL) |
+| `sec_edgar` | `api/xbrl/companyfacts` | `2026-10-10T10:53:39.715601+00:00` | Primary Evidence | [Link](https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json) |
+| `gdelt` | `doc/doc` | `2026-10-10T10:53:39.979041+00:00` | Primary Evidence | [Link](https://www.gdeltproject.org/) |
 
 ---
 

@@ -1,7 +1,7 @@
 # Apple Inc. (AAPL) — Research Overview & Executive Dashboard
 
 > **Institutional Multi-Agent AI Equity Research System**  
-> **Target Horizon**: 6-12 months | **As of**: 2026-09-14 06:37 UTC | **Audit Status**: All 12 Gates Passed (Verified)
+> **Target Horizon**: 6-12 months | **As of**: 2026-10-10 10:53 UTC | **Audit Status**: All 12 Gates Passed (Verified)
 
 ---
 
@@ -10,8 +10,8 @@
 | Key Metric | Status / Value | Quick Interpretation |
 | :--- | :---: | :--- |
 | **Overall Stance** | 🟢 **BULLISH / HIGH CONVICTION** | Systematic multi-agent recommendation |
-| **Composite AI Score** | **`8.3 / 10.0`** | Weighted institutional formula ($0.40F + 0.35T + 0.15S + 0.10M$) |
-| **Normalized Score** | **`81.6 / 100`** | Standardized 0–100 percentile rank |
+| **Composite AI Score** | **`8.4 / 10.0`** | Weighted institutional formula ($0.40F + 0.35T + 0.15S + 0.10M$) |
+| **Normalized Score** | **`82.1 / 100`** | Standardized 0–100 percentile rank |
 | **Confidence Score** | **`1.00 / 1.00`** | Data completeness score (100% verified) |
 | **Quality Gates** | **12 / 12 Passed (0 Vetos)** | Data integrity, SEC/SEDAR filings & freshness verified |
 
@@ -22,7 +22,7 @@
 ```
 Dimension          Score    Visual Gauge      Rating
 -------------------------------------------------------
-Fundamental         9.2/10  [█████████░]  🟢 Strong
+Fundamental         9.3/10  [█████████░]  🟢 Strong
 Technical           8.0/10  [████████░░]  🟢 Bullish
 Risk & Solvency     8.5/10  [████████░░]  🟢 Low Risk
 Sentiment           7.0/10  [███████░░░]  🟢 Positive
@@ -34,8 +34,20 @@ Management          8.0/10  [████████░░]  🟢 Disciplined
 Catalyst            7.5/10  [████████░░]  🟢 Active
 Event Risk          8.0/10  [████████░░]  🟢 Benign
 -------------------------------------------------------
-COMPOSITE AI SCORE  8.3/10  [████████░░]  🟢 **BULLISH / HIGH CONVICTION**
+COMPOSITE AI SCORE  8.4/10  [████████░░]  🟢 **BULLISH / HIGH CONVICTION**
 ```
+
+---
+
+## 🎯 Visual Multi-Dimensional Radar & Technical Gauges
+
+<p align="center">
+  <img src="./assets/radar_score_chart.png" alt="Multi-Dimensional Performance Pentagon" width="480" />
+</p>
+
+<p align="center">
+  <img src="./assets/technical_gauges.png" alt="Technical Indicators Summary Gauges" width="750" />
+</p>
 
 ---
 
@@ -43,7 +55,7 @@ COMPOSITE AI SCORE  8.3/10  [████████░░]  🟢 **BULLISH / H
 
 ```mermaid
 graph LR
-    A["🎯 <b>AAPL</b><br/>AI Score: 8.3/10"] --> B["🟢 <b>Bull Case (+20%)</b><br/>High-margin expansion<br/>Ecosystem adoption"]
+    A["🎯 <b>AAPL</b><br/>AI Score: 8.4/10"] --> B["🟢 <b>Bull Case (+20%)</b><br/>High-margin expansion<br/>Ecosystem adoption"]
     A --> C["🔵 <b>Base Case (+8%)</b><br/>Steady single-digit expansion<br/>Accretive capital return"]
     A --> D["🟠 <b>Bear Case (-18%)</b><br/>Macro/Consumer slowing<br/>Fee compression"]
     A --> E["🔴 <b>Stress Case (-35%)</b><br/>Severe supply bottleneck<br/>Trade friction"]
@@ -65,7 +77,7 @@ flowchart TD
         R2["Antitrust & Digital Marketplace Platform Inquiries"]
         R3["Elongated Consumer Hardware Replacement Cycles"]
     end
-    Strengths --> Summary["🏁 <b>Final Verdict</b>: 8.3 / 10.0 (81.6/100)<br/>Confidence: 1.00 / 1.00"]
+    Strengths --> Summary["🏁 <b>Final Verdict</b>: 8.4 / 10.0 (82.1/100)<br/>Confidence: 1.00 / 1.00"]
     Risks --> Summary
 ```
 

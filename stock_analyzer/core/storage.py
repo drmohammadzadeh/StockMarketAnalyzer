@@ -58,10 +58,13 @@ class ResearchStorage:
 
         return paths
 
-    def get_symbol_dir(self, symbol: str, folder_name: str) -> Path:
-        """Get the path to a specific folder for a security."""
+    def get_symbol_dir(self, symbol: str, folder_name: Optional[str] = None) -> Path:
+        """Get the path to a specific folder or root directory for a security."""
         clean_symbol = symbol.strip().upper()
-        path = self.base_dir / clean_symbol / folder_name
+        if folder_name:
+            path = self.base_dir / clean_symbol / folder_name
+        else:
+            path = self.base_dir / clean_symbol
         path.mkdir(parents=True, exist_ok=True)
         return path
 

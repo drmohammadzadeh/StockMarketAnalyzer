@@ -1,5 +1,6 @@
 """Base Specialist Agent with Gemini Flash 3.8 and Deterministic Offline Mock."""
 
+import asyncio
 import json
 import os
 from typing import Any, Dict, Optional
@@ -59,10 +60,14 @@ class BaseAgent:
 
             for model in candidate_models:
                 try:
-                    response = client.models.generate_content(
-                        model=model,
-                        contents=prompt,
-                        config={"response_mime_type": "application/json"},
+                    response = await asyncio.wait_for(
+                        asyncio.to_thread(
+                            client.models.generate_content,
+                            model=model,
+                            contents=prompt,
+                            config={"response_mime_type": "application/json"},
+                        ),
+                        timeout=7.0,
                     )
                     text = response.text or ""
                     if "```json" in text:

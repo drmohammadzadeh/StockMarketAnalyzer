@@ -24,6 +24,7 @@ from stock_analyzer.engine.fundamental import FundamentalEngine
 from stock_analyzer.engine.forensics import ForensicsEngine
 from stock_analyzer.engine.valuation import ValuationEngine
 from stock_analyzer.engine.scoring import ScoringEngine
+from stock_analyzer.engine.charts import generate_radar_chart, generate_technical_gauges
 
 from stock_analyzer.agents.specialists.fundamental import FundamentalAgent
 from stock_analyzer.agents.specialists.technical import TechnicalAgent
@@ -290,8 +291,47 @@ class ResearchOrchestrator:
             json.dump(scores.model_dump(), f, indent=2)
 
         # -------------------------------------------------------------
-        # Phase 8: Delivery Manager & Report Publishing (Gate 12)
+        # Phase 8: Delivery Manager, Charts & Report Publishing (Gate 12)
         # -------------------------------------------------------------
+        symbol_root_dir = self.storage.get_symbol_dir(clean_symbol)
+        assets_dir = symbol_root_dir / "assets"
+        assets_dir.mkdir(parents=True, exist_ok=True)
+
+        curr_close = float(df_adj["close"].iloc[-1])
+        prev_close = float(df_adj["close"].iloc[-2]) if len(df_adj) >= 2 else curr_close
+        p_chg = curr_close - prev_close
+        p_chg_pct = (p_chg / prev_close) * 100.0 if prev_close != 0 else 0.0
+
+        # Technical indicator votes matching TradingView layout
+        tech_votes = self.tech_engine.compute_indicator_votes(df_adj, indicators)
+
+        # Performance pentagon dimensions matching GuruFocus layout
+        radar_dims = {
+            "profitability": min(100.0, max(15.0, float(sub_scores.get("fundamental", 9.0)) * 10.0)),
+            "valuation": min(100.0, max(15.0, float(sub_scores.get("valuation", 6.5)) * 10.0)),
+            "momentum": min(100.0, max(15.0, float(sub_scores.get("technical", 8.0)) * 10.0)),
+            "financial_strength": min(100.0, max(15.0, float(sub_scores.get("risk", 8.5)) * 10.0)),
+            "growth": min(100.0, max(15.0, float(sub_scores.get("growth", 4.0)) * 10.0)),
+        }
+
+        generate_radar_chart(
+            symbol=clean_symbol,
+            company_name=identity.company_name,
+            score_100=scores.normalized_100_score,
+            dimensions=radar_dims,
+            output_path=assets_dir / "radar_score_chart.png",
+        )
+
+        generate_technical_gauges(
+            symbol=clean_symbol,
+            company_name=identity.company_name,
+            current_price=curr_close,
+            price_change=p_chg,
+            price_change_pct=p_chg_pct,
+            technical_votes=tech_votes,
+            output_path=assets_dir / "technical_gauges.png",
+        )
+
         all_provs = self.provenance_tracker.get_records_for_symbol(clean_symbol)
         report_md, plain_md, report_json = self.delivery_manager.generate_reports(
             symbol=clean_symbol,
