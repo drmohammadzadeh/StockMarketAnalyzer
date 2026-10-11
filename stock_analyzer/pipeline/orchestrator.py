@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import pandas as pd
@@ -24,7 +25,14 @@ from stock_analyzer.engine.fundamental import FundamentalEngine
 from stock_analyzer.engine.forensics import ForensicsEngine
 from stock_analyzer.engine.valuation import ValuationEngine
 from stock_analyzer.engine.scoring import ScoringEngine
-from stock_analyzer.engine.charts import generate_radar_chart, generate_technical_gauges
+from stock_analyzer.engine.charts import (
+    generate_radar_chart,
+    generate_technical_gauges,
+    generate_price_action_chart,
+    generate_financial_waterfall_chart,
+    generate_valuation_margin_chart,
+)
+from stock_analyzer.engine.excalidraw_generator import generate_moat_excalidraw_diagram
 
 from stock_analyzer.agents.specialists.fundamental import FundamentalAgent
 from stock_analyzer.agents.specialists.technical import TechnicalAgent
@@ -40,7 +48,9 @@ from stock_analyzer.agents.judges.domain_judges import (
     FundamentalJudge, TechnicalJudge, RiskJudge, SentimentJudge, QuantJudge, EvidenceJudge, ReportQualityJudge
 )
 from stock_analyzer.agents.chief_reviewer import ChiefReviewer
-from stock_analyzer.agents.delivery_manager import DeliveryManager
+from stock_analyzer.agents.delivery_manager import DeliveryManager, get_company_profile
+
+logger = logging.getLogger(__name__)
 
 
 class ResearchOrchestrator:
@@ -271,6 +281,7 @@ class ResearchOrchestrator:
             "net_income": ni_curr,
             "operating_cash_flow": cfo_curr,
             "capex": capex_curr,
+            "free_cash_flow": fund_metrics.get("free_cash_flow", cfo_curr - capex_curr),
             "total_debt": debt_curr,
             "assets": assets_curr,
             "current_assets": curr_assets,
@@ -285,6 +296,11 @@ class ResearchOrchestrator:
             "market_cap": market_cap,
             "operating_income": op_inc_curr,
             "close": indicators["current_price"],
+            "current_price": indicators.get("current_price", float(df_adj["close"].iloc[-1])),
+            "intrinsic_value": val_metrics.get("intrinsic_value_per_share", val_metrics.get("intrinsic_value", float(df_adj["close"].iloc[-1]))),
+            "graham_number": val_metrics.get("graham_number"),
+            "fifty_two_week_low": float(df_adj["low"].min()) if "low" in df_adj.columns else None,
+            "fifty_two_week_high": float(df_adj["high"].max()) if "high" in df_adj.columns else None,
             "indicators": indicators,
             "fundamental_metrics": fund_metrics,
             "valuation": val_metrics,
@@ -384,23 +400,86 @@ class ResearchOrchestrator:
             "growth": min(100.0, max(15.0, float(sub_scores.get("growth", 4.0)) * 10.0)),
         }
 
-        generate_radar_chart(
-            symbol=clean_symbol,
-            company_name=identity.company_name,
-            score_100=scores.normalized_100_score,
-            dimensions=radar_dims,
-            output_path=assets_dir / "radar_score_chart.png",
-        )
+        generated_charts: List[str] = []
 
-        generate_technical_gauges(
-            symbol=clean_symbol,
-            company_name=identity.company_name,
-            current_price=curr_close,
-            price_change=p_chg,
-            price_change_pct=p_chg_pct,
-            technical_votes=tech_votes,
-            output_path=assets_dir / "technical_gauges.png",
-        )
+        try:
+            generate_radar_chart(
+                symbol=clean_symbol,
+                company_name=identity.company_name,
+                score_100=scores.normalized_100_score,
+                dimensions=radar_dims,
+                output_path=assets_dir / "radar_score_chart.png",
+            )
+            generated_charts.append("radar_score_chart.png")
+        except Exception as e:
+            logger.warning(f"Failed to generate radar score chart for {clean_symbol}: {e}")
+
+        try:
+            generate_technical_gauges(
+                symbol=clean_symbol,
+                company_name=identity.company_name,
+                current_price=curr_close,
+                price_change=p_chg,
+                price_change_pct=p_chg_pct,
+                technical_votes=tech_votes,
+                output_path=assets_dir / "technical_gauges.png",
+            )
+            generated_charts.append("technical_gauges.png")
+        except Exception as e:
+            logger.warning(f"Failed to generate technical gauges for {clean_symbol}: {e}")
+
+        try:
+            generate_price_action_chart(
+                df=df_adj,
+                symbol=clean_symbol,
+                company_name=identity.company_name,
+                output_path=assets_dir / "price_action_trend.png",
+            )
+            generated_charts.append("price_action_trend.png")
+        except Exception as e:
+            logger.warning(f"Failed to generate price action trend chart for {clean_symbol}: {e}")
+
+        try:
+            generate_financial_waterfall_chart(
+                financials=analysis_context,
+                symbol=clean_symbol,
+                company_name=identity.company_name,
+                output_path=assets_dir / "financial_conversion_bars.png",
+            )
+            generated_charts.append("financial_conversion_bars.png")
+        except Exception as e:
+            logger.warning(f"Failed to generate financial conversion bars for {clean_symbol}: {e}")
+
+        try:
+            generate_valuation_margin_chart(
+                valuation_data=analysis_context,
+                symbol=clean_symbol,
+                company_name=identity.company_name,
+                output_path=assets_dir / "valuation_margin_gauge.png",
+            )
+            generated_charts.append("valuation_margin_gauge.png")
+        except Exception as e:
+            logger.warning(f"Failed to generate valuation margin gauge for {clean_symbol}: {e}")
+
+        try:
+            company_profile = get_company_profile(
+                symbol=clean_symbol,
+                company_name=identity.company_name,
+                sector=identity.sector,
+                industry=identity.industry,
+            )
+            generate_moat_excalidraw_diagram(
+                symbol=clean_symbol,
+                company_name=identity.company_name,
+                profile=company_profile,
+                output_base_path=assets_dir / "business_moat_diagram",
+            )
+            generated_charts.append("business_moat_diagram.png")
+            generated_charts.append("business_moat_diagram.excalidraw")
+        except Exception as e:
+            logger.warning(f"Failed to generate business moat diagram for {clean_symbol}: {e}")
+
+        audit.log_event("CHARTS_GENERATED", {"charts": generated_charts})
 
         all_provs = self.provenance_tracker.get_records_for_symbol(clean_symbol)
 
