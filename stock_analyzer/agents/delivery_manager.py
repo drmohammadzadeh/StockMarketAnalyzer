@@ -478,6 +478,10 @@ class DeliveryManager:
 * **Operating Efficiency**: Operating margins remain comfortably at **{op_margin:.2f}%**, reflecting pricing power.
 * **Balance Sheet Health**: Cash and marketable securities provide substantial liquidity buffer. Net debt-to-EBITDA remains conservative at **{net_debt_to_ebitda:.2f}x**.
 
+<p align="center">
+  <img src="../assets/financial_conversion_bars.png" alt="Financial Conversion & Cash Flow Engine" width="750" />
+</p>
+
 ### Verifiable Fundamental Derivations & SEC XBRL Citations
 | Metric | Value | Derivation Formula | Numerical Inputs Used | SEC EDGAR Source Tag |
 | :--- | :---: | :--- | :--- | :--- |
@@ -494,6 +498,10 @@ class DeliveryManager:
 * **Benjamin Graham Defensive Benchmark**: Provides a conservative tangible floor at **${graham:.2f}**.
 * **Market Price Comparison**: Current market trading price is **${curr_p:.2f}**.
 
+<p align="center">
+  <img src="../assets/valuation_margin_gauge.png" alt="Valuation Range & Margin of Safety Gauge" width="750" />
+</p>
+
 ### Verifiable Valuation Model Inputs
 | Valuation Metric | Computed Value | Mathematical Derivation | Numerical Inputs Used | Data Source Provenance |
 | :--- | :---: | :--- | :--- | :--- |
@@ -507,6 +515,10 @@ class DeliveryManager:
 * **Moving Averages**: Current price trades at **${curr_p:.2f}**, above both the 50-day (${sma50:.2f}) and 200-day (${sma200:.2f}) simple moving averages.
 * **Momentum**: 14-day RSI stands at **{rsi14:.2f}**, indicating strong positive trend momentum without extreme distribution.
 * **MACD**: MACD histogram reflects constructive bullish expansion at **{macd:.2f}**.
+
+<p align="center">
+  <img src="../assets/price_action_trend.png" alt="252-Day Price Action & Trend Ribbon" width="750" />
+</p>
 
 ### Verifiable Technical Indicators
 | Indicator | Observed Value | Formula / Method | Lookback Window | Source Data Artifact |
@@ -549,6 +561,12 @@ class DeliveryManager:
 ## 9. Business and Competitive Analysis
 * **Economic Moat**: {profile['moat']}
 * **Pricing Power**: Sustained gross margins confirm ability to pass along component inflation and scale economies.
+
+<p align="center">
+  <img src="../assets/business_moat_diagram.png" alt="Strategic Business Moat & Flywheel Architecture" width="750" />
+</p>
+
+> 💡 **Excalidraw Visual Model**: [Interactive Excalidraw Diagram File](../assets/business_moat_diagram.excalidraw)
 
 ---
 
@@ -817,15 +835,35 @@ COMPOSITE AI SCORE {scores.base_ai_score:4.1f}/10  [{_meter(scores.base_ai_score
 
 ---
 
-## 🎯 Visual Multi-Dimensional Radar & Technical Gauges
+## 🎯 Executive Visual Intelligence Gallery
 
+### Tier 1: Multi-Dimensional Performance Radar & Technical Gauges
 <p align="center">
-  <img src="./assets/radar_score_chart.png" alt="Multi-Dimensional Performance Pentagon" width="480" />
+  <img src="./assets/radar_score_chart.png" alt="Multi-Dimensional Performance Pentagon" width="450" />
+  <img src="./assets/technical_gauges.png" alt="Technical Indicators Summary Gauges" width="450" />
 </p>
 
+### Tier 2: 252-Day Price Action & Trend Ribbon
 <p align="center">
-  <img src="./assets/technical_gauges.png" alt="Technical Indicators Summary Gauges" width="750" />
+  <img src="./assets/price_action_trend.png" alt="252-Day Price Action & Trend Ribbon" width="800" />
 </p>
+
+### Tier 3: Financial Conversion & Cash Flow Engine
+<p align="center">
+  <img src="./assets/financial_conversion_bars.png" alt="Financial Conversion & Cash Flow Engine" width="800" />
+</p>
+
+### Tier 4: Valuation Range & Margin of Safety
+<p align="center">
+  <img src="./assets/valuation_margin_gauge.png" alt="Valuation Range & Margin of Safety" width="800" />
+</p>
+
+### Tier 5: Strategic Business Moat & Flywheel Architecture
+<p align="center">
+  <img src="./assets/business_moat_diagram.png" alt="Strategic Business Moat & Flywheel Architecture" width="800" />
+</p>
+
+> 💡 **Excalidraw Visual Model**: [Interactive Excalidraw Diagram File](./assets/business_moat_diagram.excalidraw)
 
 ---
 

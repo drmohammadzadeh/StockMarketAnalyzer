@@ -68,6 +68,15 @@ def test_report_generation():
     assert "### Verifiable Valuation Model Inputs" in report_md
     assert "### Master Observability Ledger" in report_md
 
+    # Check contextual chart embeds in report_md chapters
+    assert "../assets/radar_score_chart.png" in report_md
+    assert "../assets/financial_conversion_bars.png" in report_md
+    assert "../assets/valuation_margin_gauge.png" in report_md
+    assert "../assets/price_action_trend.png" in report_md
+    assert "../assets/technical_gauges.png" in report_md
+    assert "../assets/business_moat_diagram.png" in report_md
+    assert "../assets/business_moat_diagram.excalidraw" in report_md
+
     # 2. Check Plain English summary
     assert "## In Plain English" in plain_md
     assert "What the company does" in plain_md
@@ -90,6 +99,14 @@ def test_report_generation():
     assert "# Apple Inc. (AAPL) — Research Overview & Executive Dashboard" in readme_md
     assert "## ⚡ At-a-Glance Executive Summary" in readme_md
     assert "## 📊 Visual Multi-Dimensional Scorecard" in readme_md
+    assert "## 🎯 Executive Visual Intelligence Gallery" in readme_md
+    assert "assets/radar_score_chart.png" in readme_md
+    assert "assets/technical_gauges.png" in readme_md
+    assert "assets/price_action_trend.png" in readme_md
+    assert "assets/financial_conversion_bars.png" in readme_md
+    assert "assets/valuation_margin_gauge.png" in readme_md
+    assert "assets/business_moat_diagram.png" in readme_md
+    assert "assets/business_moat_diagram.excalidraw" in readme_md
     assert "## 🔍 Verifiable Evidence & Calculation Proof Ledger" in readme_md
     assert "```mermaid" in readme_md
     assert "graph LR" in readme_md
