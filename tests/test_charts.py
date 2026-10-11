@@ -6,6 +6,7 @@ import pytest
 from stock_analyzer.engine.charts import (
     generate_financial_waterfall_chart,
     generate_price_action_chart,
+    generate_valuation_margin_chart,
 )
 
 
@@ -82,4 +83,54 @@ def test_generate_financial_waterfall_chart_zero_and_missing_values(tmp_path: Pa
     assert result_partial.exists()
     assert result_partial == out_file_partial
     assert result_partial.stat().st_size > 1000
+
+
+def test_generate_valuation_margin_chart_premium(tmp_path: Path):
+    data = {
+        "current_price": 262.43,
+        "intrinsic_value": 229.22,
+        "graham_number": 78.60,
+        "fifty_two_week_low": 165.0,
+        "fifty_two_week_high": 275.0,
+    }
+    out_file = tmp_path / "valuation_premium.png"
+    result = generate_valuation_margin_chart(data, "AMZN", "Amazon.com, Inc.", out_file)
+    assert result.exists()
+    assert result == out_file
+    assert result.stat().st_size > 5000
+
+
+def test_generate_valuation_margin_chart_discount(tmp_path: Path):
+    data = {
+        "current_price": 100.0,
+        "intrinsic_value_per_share": 135.0,
+        "graham_number": 95.0,
+        "fifty_two_week_low": 80.0,
+        "fifty_two_week_high": 120.0,
+    }
+    out_file = tmp_path / "valuation_discount.png"
+    result = generate_valuation_margin_chart(data, "GOOGL", "Alphabet Inc.", out_file)
+    assert result.exists()
+    assert result == out_file
+    assert result.stat().st_size > 5000
+
+
+def test_generate_valuation_margin_chart_missing_optional_keys(tmp_path: Path):
+    # Minimal data: only current_price and intrinsic_value, omitting 52w bounds and graham floor
+    data_minimal = {
+        "current_price": 150.0,
+        "intrinsic_value": 160.0,
+    }
+    out_file_minimal = tmp_path / "valuation_minimal.png"
+    result_minimal = generate_valuation_margin_chart(data_minimal, "AAPL", "Apple Inc.", out_file_minimal)
+    assert result_minimal.exists()
+    assert result_minimal == out_file_minimal
+    assert result_minimal.stat().st_size > 3000
+
+    # Completely empty dictionary
+    out_file_empty = tmp_path / "valuation_empty.png"
+    result_empty = generate_valuation_margin_chart({}, "EMPTY", "Empty Corp", out_file_empty)
+    assert result_empty.exists()
+    assert result_empty == out_file_empty
+    assert result_empty.stat().st_size > 3000
 

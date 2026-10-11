@@ -2,6 +2,9 @@
 Generates:
 1. GuruFocus-style Radar / Spider Score Chart (5-dimensional polygon).
 2. TradingView-style Technical Indicator Speedometer Gauges (Oscillators, Summary, Moving Averages).
+3. Trend Ribbon & Technical Price Action Chart (252-day price, 50/200 SMA ribbon, volume, 14-day RSI).
+4. Financial Conversion & Cash Flow Waterfall Chart (Revenue -> EBIT -> Net Income -> CFO -> FCF).
+5. Valuation Margin-of-Safety Gauge (Horizontal DCF Fair Value vs Market Price vs Graham Floor).
 """
 
 from pathlib import Path
@@ -623,6 +626,154 @@ def generate_financial_waterfall_chart(
     ax.set_ylim(y_bottom, y_top)
 
     plt.savefig(output_path, bbox_inches="tight", facecolor=fig.get_facecolor(), dpi=200)
+    plt.close(fig)
+    return output_path
+
+
+def generate_valuation_margin_chart(
+    valuation_data: Dict[str, float],
+    symbol: str,
+    company_name: str,
+    output_path: Path,
+) -> Path:
+    """
+    Renders horizontal target gauge comparing Market Price to DCF Intrinsic Value and Graham Number floor.
+    Features:
+    - 3 color-coded zones: Undervalued (< 0.85 DCF), Fair Value Range (0.85 - 1.15 DCF), Premium / Overheated (> 1.15 DCF).
+    - DCF Fair Value line, Graham Number floor, Current Market Price pointer callout.
+    - Margin of Safety discount/premium percentage banner in title.
+    - Dark institutional aesthetic (#0f172a figure, #1e293b axes).
+    """
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    val_dict = valuation_data or {}
+
+    curr_p = float(val_dict.get("current_price") or 100.0)
+    dcf_val = float(
+        val_dict.get("intrinsic_value")
+        or val_dict.get("intrinsic_value_per_share")
+        or curr_p
+    )
+    if curr_p <= 0.0:
+        curr_p = dcf_val if dcf_val > 0.0 else 100.0
+    if dcf_val <= 0.0:
+        dcf_val = curr_p if curr_p > 0.0 else 100.0
+
+    graham_val = val_dict.get("graham_number")
+    graham = float(graham_val) if (graham_val is not None and float(graham_val) > 0.0) else None
+
+    low_52_val = val_dict.get("fifty_two_week_low")
+    low_52 = float(low_52_val) if (low_52_val is not None and float(low_52_val) > 0.0) else (curr_p * 0.7)
+
+    high_52_val = val_dict.get("fifty_two_week_high")
+    high_52 = float(high_52_val) if (high_52_val is not None and float(high_52_val) > 0.0) else (curr_p * 1.3)
+
+    min_candidates = [dcf_val * 0.7, curr_p * 0.8, low_52]
+    if graham is not None:
+        min_candidates.append(graham)
+    min_x = max(0.0, min(min_candidates) * 0.95)
+
+    max_candidates = [dcf_val * 1.3, curr_p * 1.15, high_52]
+    max_x = max(max_candidates) * 1.05
+    if max_x <= min_x:
+        max_x = min_x + 50.0
+
+    fig, ax = plt.subplots(figsize=(9.5, 3.8), dpi=200, facecolor="#0f172a")
+    ax.set_facecolor("#1e293b")
+
+    # Zones: Undervalued (up to 0.85 DCF), Fair Value (0.85 - 1.15 DCF), Premium / Overheated (> 1.15 DCF)
+    underval_end = dcf_val * 0.85
+    overval_start = dcf_val * 1.15
+
+    ax.axvspan(min_x, underval_end, color="#22c55e", alpha=0.25, label="Undervalued Zone (< 0.85 DCF)")
+    ax.axvspan(underval_end, overval_start, color="#f59e0b", alpha=0.25, label="Fair Value Range (0.85 - 1.15 DCF)")
+    ax.axvspan(overval_start, max_x, color="#ef4444", alpha=0.25, label="Premium / Overheated Zone (> 1.15 DCF)")
+
+    # Markers
+    ax.plot(
+        [dcf_val, dcf_val],
+        [-0.5, 0.5],
+        color="#38bdf8",
+        linewidth=3.5,
+        label=f"DCF Fair Value (${dcf_val:.2f})",
+        zorder=5,
+    )
+    if graham is not None:
+        ax.plot(
+            [graham, graham],
+            [-0.3, 0.3],
+            color="#a855f7",
+            linewidth=2.5,
+            linestyle="--",
+            label=f"Graham Floor (${graham:.2f})",
+            zorder=5,
+        )
+
+    # Current Market Price pointer
+    ax.scatter(
+        [curr_p],
+        [0.0],
+        color="#f8fafc",
+        s=180,
+        edgecolors="#e11d48",
+        linewidth=3.0,
+        zorder=6,
+        label=f"Market Price (${curr_p:.2f})",
+    )
+    ax.annotate(
+        f"Current Close: ${curr_p:.2f}",
+        (curr_p, 0.0),
+        xytext=(0, 25),
+        textcoords="offset points",
+        ha="center",
+        color="#f8fafc",
+        fontweight="bold",
+        fontsize=10.5,
+        bbox=dict(boxstyle="round,pad=0.35", fc="#e11d48", ec="none"),
+        zorder=7,
+    )
+
+    diff_pct = ((dcf_val - curr_p) / curr_p) * 100.0
+    if diff_pct > 0.0:
+        status_str = f"Discount: +{diff_pct:.1f}% (Undervalued)"
+    else:
+        status_str = f"Premium: {abs(diff_pct):.1f}% (Above DCF)"
+
+    ax.set_title(
+        f"{company_name} ({symbol}) — Valuation Range & Margin of Safety\n{status_str}",
+        fontsize=12,
+        fontweight="bold",
+        color="#f8fafc",
+        pad=12,
+    )
+
+    ax.set_xlim(min_x, max_x)
+    ax.set_ylim(-0.8, 0.8)
+    ax.set_yticks([])
+    ax.tick_params(colors="#94a3b8")
+    ax.grid(axis="x", color="#334155", linestyle="--", linewidth=0.7, alpha=0.6)
+
+    if (max_x - min_x) < 10.0:
+        ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda val, pos: f"${val:.2f}"))
+    else:
+        ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda val, pos: f"${val:.0f}"))
+
+    ncol = 5 if graham is not None else 4
+    ax.legend(
+        loc="lower center",
+        bbox_to_anchor=(0.5, -0.48),
+        ncol=ncol,
+        facecolor="#1e293b",
+        edgecolor="#334155",
+        labelcolor="#f8fafc",
+        fontsize=8.5,
+    )
+
+    plt.savefig(
+        output_path,
+        bbox_inches="tight",
+        facecolor=fig.get_facecolor(),
+        dpi=200,
+    )
     plt.close(fig)
     return output_path
 
