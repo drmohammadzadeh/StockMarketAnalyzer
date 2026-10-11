@@ -15,11 +15,11 @@ Amazon.com, Inc. operates the world's largest online shopping marketplace, deliv
 * **Antitrust regulatory pressure**: Regulators in the US and Europe continue investigating retail marketplace practices and seller fees.
 
 ### What is attractive
-* Top-tier financial safety with low debt and enormous cash reserves (Altman Z-Score: 5.82, Safe Zone).
-* Dependable profits and high return on every dollar invested into the business (ROIC: 17.2%).
+* Top-tier financial safety with low debt and enormous cash reserves (Altman Z-Score: 11.08, Safe Zone).
+* Dependable profits and high return on every dollar invested into the business (ROIC: 21.3%).
 
 ### What is expensive
-* Its valuation multiples trade at a premium compared to the average company in the stock market (currently trading at $262.43 vs. $229.22 DCF fair value).
+* Its valuation multiples trade at a premium compared to the average company in the stock market (currently trading at $262.43 vs. $187.86 DCF fair value).
 
 ### What is risky
 * Any delay or bottleneck in operations or heightened regulatory friction could impact operational efficiency.
@@ -34,4 +34,4 @@ Amazon.com, Inc. operates the world's largest online shopping marketplace, deliv
 * The next quarterly financial results and announcements about new enterprise initiatives and operating performance.
 
 ---
-**AI Score**: **7.0 / 10** | **Confidence**: **1.00 / 1.00**
+**AI Score**: **7.1 / 10** | **Confidence**: **1.00 / 1.00**

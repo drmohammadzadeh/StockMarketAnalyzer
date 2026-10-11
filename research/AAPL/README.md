@@ -1,7 +1,7 @@
 # Apple Inc. (AAPL) — Research Overview & Executive Dashboard
 
 > **Institutional Multi-Agent AI Equity Research System**  
-> **Target Horizon**: 6-12 months | **As of**: 2026-10-10 11:47 UTC | **Audit Status**: All 12 Gates Passed (Verified)
+> **Target Horizon**: 6-12 months | **As of**: 2026-10-11 07:12 UTC | **Audit Status**: All 12 Gates Passed (Verified)
 
 ---
 
@@ -9,9 +9,9 @@
 
 | Key Metric | Status / Value | Quick Interpretation |
 | :--- | :---: | :--- |
-| **Overall Stance** | 🟢 **BULLISH / HIGH CONVICTION** | Systematic multi-agent recommendation |
-| **Composite AI Score** | **`8.6 / 10.0`** | Weighted institutional formula ($0.40F + 0.35T + 0.15S + 0.10M$) |
-| **Normalized Score** | **`84.3 / 100`** | Standardized 0–100 percentile rank |
+| **Overall Stance** | 🟢 **MODERATELY BULLISH** | Systematic multi-agent recommendation |
+| **Composite AI Score** | **`7.1 / 10.0`** | Weighted institutional formula ($0.40F + 0.35T + 0.15S + 0.10M$) |
+| **Normalized Score** | **`67.6 / 100`** | Standardized 0–100 percentile rank |
 | **Confidence Score** | **`1.00 / 1.00`** | Data completeness score (100% verified) |
 | **Quality Gates** | **12 / 12 Passed (0 Vetos)** | Data integrity, SEC/SEDAR filings & freshness verified |
 
@@ -22,32 +22,52 @@
 ```
 Dimension          Score    Visual Gauge      Rating
 -------------------------------------------------------
-Fundamental         9.9/10  [██████████]  🟢 Strong
+Fundamental         6.1/10  [██████░░░░]  🟡 Moderate
 Technical           8.0/10  [████████░░]  🟢 Bullish
 Risk & Solvency     8.5/10  [████████░░]  🟢 Low Risk
 Sentiment           7.0/10  [███████░░░]  🟢 Positive
 Valuation           6.5/10  [██████░░░░]  🟡 Fair
 Growth              7.5/10  [████████░░]  🟢 High
-Quality             7.0/10  [███████░░░]  🟡 Average
+Quality             8.0/10  [████████░░]  🟢 Elite
 Business Strength   9.0/10  [█████████░]  🟢 Wide Moat
 Management          8.0/10  [████████░░]  🟢 Disciplined
 Catalyst            7.5/10  [████████░░]  🟢 Active
 Event Risk          8.0/10  [████████░░]  🟢 Benign
 -------------------------------------------------------
-COMPOSITE AI SCORE  8.6/10  [█████████░]  🟢 **BULLISH / HIGH CONVICTION**
+COMPOSITE AI SCORE  7.1/10  [███████░░░]  🟢 **MODERATELY BULLISH**
 ```
 
 ---
 
-## 🎯 Visual Multi-Dimensional Radar & Technical Gauges
+## 🎯 Executive Visual Intelligence Gallery
 
+### Tier 1: Multi-Dimensional Performance Radar & Technical Gauges
 <p align="center">
-  <img src="./assets/radar_score_chart.png" alt="Multi-Dimensional Performance Pentagon" width="480" />
+  <img src="./assets/radar_score_chart.png" alt="Multi-Dimensional Performance Pentagon" width="450" />
+  <img src="./assets/technical_gauges.png" alt="Technical Indicators Summary Gauges" width="450" />
 </p>
 
+### Tier 2: 252-Day Price Action & Trend Ribbon
 <p align="center">
-  <img src="./assets/technical_gauges.png" alt="Technical Indicators Summary Gauges" width="750" />
+  <img src="./assets/price_action_trend.png" alt="252-Day Price Action & Trend Ribbon" width="800" />
 </p>
+
+### Tier 3: Financial Conversion & Cash Flow Engine
+<p align="center">
+  <img src="./assets/financial_conversion_bars.png" alt="Financial Conversion & Cash Flow Engine" width="800" />
+</p>
+
+### Tier 4: Valuation Range & Margin of Safety
+<p align="center">
+  <img src="./assets/valuation_margin_gauge.png" alt="Valuation Range & Margin of Safety" width="800" />
+</p>
+
+### Tier 5: Strategic Business Moat & Flywheel Architecture
+<p align="center">
+  <img src="./assets/business_moat_diagram.png" alt="Strategic Business Moat & Flywheel Architecture" width="800" />
+</p>
+
+> 💡 **Excalidraw Visual Model**: [Interactive Excalidraw Diagram File](./assets/business_moat_diagram.excalidraw)
 
 ---
 
@@ -57,19 +77,19 @@ Every number and metric presented is traceable to primary sources and mathematic
 
 | Metric | Reported Value | Mathematical Formula | Numerical Inputs Used | Primary Source Provenance | Artifact Trace |
 | :--- | :---: | :--- | :--- | :--- | :--- |
-| **Operating Margin** | `31.97%` | Operating Income / Total Revenue * 100 | Operating Income = $133,050,000,000, Revenue = $416,161,000,000 | SEC EDGAR 10-K/10-Q (us-gaap: Revenues, OperatingIncomeLoss) | [`04_filings/sec_facts.json`](./04_filings/sec_facts.json) |
-| **Net Profit Margin** | `26.92%` | Net Income / Total Revenue * 100 | Net Income = $112,010,000,000, Revenue = $416,161,000,000 | SEC EDGAR 10-K/10-Q (us-gaap: NetIncomeLoss) | [`04_filings/sec_facts.json`](./04_filings/sec_facts.json) |
-| **Return on Invested Capital (ROIC)** | `97.04%` | [Operating Income * (1 - Tax Rate)] / (Total Debt + Total Equity - Cash) | Operating Income = $133,050,000,000, Tax Rate = 16.0%, Debt = $78,328,000,000, Equity = $66,782,000,000, Cash = $29,943,000,000 | SEC EDGAR 10-K (us-gaap: LongTermDebt, StockholdersEquity, CashAndCashEquivalentsAtCarryingValue) | [`04_filings/sec_facts.json`](./04_filings/sec_facts.json) |
-| **Free Cash Flow (FCF)** | `$98.77B` | Operating Cash Flow - Capital Expenditures | Operating Cash Flow = $111,482,000,000, Capex = $12,715,000,000 | SEC EDGAR 10-K (us-gaap: NetCashProvidedByUsedInOperatingActivities, PaymentsToAcquirePropertyPlantAndEquipment) | [`04_filings/sec_facts.json`](./04_filings/sec_facts.json) |
-| **Piotroski F-Score** | `6 / 9 (High Quality)` | Sum of 9 Fundamental Binary Quality Criteria | ROA>0, CFO>0, delta ROA>=0, CFO>NI, delta Debt<=0, delta CR>=0, No Dilution, delta GM>=0, delta AT>=0 | SEC EDGAR multi-period financial statements | [`04_filings/sec_facts.json`](./04_filings/sec_facts.json) |
-| **Altman Z-Score** | `8.57 (Safe Zone)` | 1.2*X1 + 1.4*X2 + 3.3*X3 + 0.6*X4 + 0.999*X5 | Assets = $359,241,000,000, Sales = $416,161,000,000, EBIT = $133,050,000,000, MCap = $3.00T, Liabilities = $290.0B | SEC EDGAR 10-K balance sheet & income statement | [`04_filings/sec_facts.json`](./04_filings/sec_facts.json) |
-| **DCF Fair Value (FCFF)** | `$116.74` | [PV(5-Yr FCF) + PV(Terminal Value) - Net Debt] / Shares | Base FCF = $98.77B, WACC = 8.5%, Growth = 6.0%, Terminal g = 2.5%, Net Debt = $48.38B, Shares = 15.20B | Discounted Cash Flow Model + SEC 10-K share count | [`21_scores/scores.json`](./21_scores/scores.json) |
-| **Benjamin Graham Defensive Number** | `$60.47` | sqrt(22.5 * EPS * BVPS) | EPS = $6.50, BVPS = $25.00 | Graham & Dodd Security Analysis Model | [`21_scores/scores.json`](./21_scores/scores.json) |
+| **Operating Margin** | `15.00%` | Operating Income / Total Revenue * 100 | Operating Income = $58,655,250,000, Revenue = $391,035,000,000 | SEC EDGAR 10-K/10-Q (us-gaap: Revenues, OperatingIncomeLoss) | [`04_filings/sec_facts.json`](./04_filings/sec_facts.json) |
+| **Net Profit Margin** | `23.97%` | Net Income / Total Revenue * 100 | Net Income = $93,736,000,000, Revenue = $391,035,000,000 | SEC EDGAR 10-K/10-Q (us-gaap: NetIncomeLoss) | [`04_filings/sec_facts.json`](./04_filings/sec_facts.json) |
+| **Return on Invested Capital (ROIC)** | `21.26%` | [Operating Income * (1 - Tax Rate)] / (Total Debt + Total Equity - Cash) | Operating Income = $58,655,250,000, Tax Rate = 16.0%, Debt = $85,750,000,000, Equity = $182,490,000,000, Cash = $36,498,000,000 | SEC EDGAR 10-K (us-gaap: LongTermDebt, StockholdersEquity, CashAndCashEquivalentsAtCarryingValue) | [`04_filings/sec_facts.json`](./04_filings/sec_facts.json) |
+| **Free Cash Flow (FCF)** | `$108.81B` | Operating Cash Flow - Capital Expenditures | Operating Cash Flow = $118,265,000,000, Capex = $9,450,000,000 | SEC EDGAR 10-K (us-gaap: NetCashProvidedByUsedInOperatingActivities, PaymentsToAcquirePropertyPlantAndEquipment) | [`04_filings/sec_facts.json`](./04_filings/sec_facts.json) |
+| **Piotroski F-Score** | `7 / 9 (High Quality)` | Sum of 9 Fundamental Binary Quality Criteria | ROA>0, CFO>0, delta ROA>=0, CFO>NI, delta Debt<=0, delta CR>=0, No Dilution, delta GM>=0, delta AT>=0 | SEC EDGAR multi-period financial statements | [`04_filings/sec_facts.json`](./04_filings/sec_facts.json) |
+| **Altman Z-Score** | `13.62 (Safe Zone)` | 1.2*X1 + 1.4*X2 + 3.3*X3 + 0.6*X4 + 0.999*X5 | Assets = $364,980,000,000, Sales = $391,035,000,000, EBIT = $58,655,250,000, MCap = $3.51T, Liabilities = $182.5B | SEC EDGAR 10-K balance sheet & income statement | [`04_filings/sec_facts.json`](./04_filings/sec_facts.json) |
+| **DCF Fair Value (FCFF)** | `$187.86` | [PV(5-Yr FCF) + PV(Terminal Value) - Net Debt] / Shares | Base FCF = $108.81B, WACC = 8.5%, Growth = 6.0%, Terminal g = 2.5%, Net Debt = $49.25B, Shares = 10.43B | Discounted Cash Flow Model + SEC 10-K share count | [`21_scores/scores.json`](./21_scores/scores.json) |
+| **Benjamin Graham Defensive Number** | `$59.49` | sqrt(22.5 * EPS * BVPS) | EPS = $8.99, BVPS = $17.50 | Graham & Dodd Security Analysis Model | [`21_scores/scores.json`](./21_scores/scores.json) |
 | **14-Day RSI** | `76.54` | 100 - (100 / (1 + (Avg Gain / Avg Loss))) | 14-period daily closing changes over latest 252 bars | Market Trading Data (Yahoo Finance OHLCV) | [`02_normalized_market_data/daily_ohlcv.parquet`](./02_normalized_market_data/daily_ohlcv.parquet) |
 | **Moving Average Trend** | `SMA 50: $300.91 | SMA 200: $261.27 (Golden Cross)` | Arithmetic mean of 50-day and 200-day daily adjusted close | 252 historical trading bars | Market Trading Data (Yahoo Finance OHLCV) | [`02_normalized_market_data/daily_ohlcv.parquet`](./02_normalized_market_data/daily_ohlcv.parquet) |
 | **Macroeconomic Risk-Free Rate** | `4.25%` | 10-Year Constant Maturity Treasury Yield | FRED Series ID: DGS10 | Federal Reserve Bank of St. Louis (FRED API) | [`08_macro/macro_snapshot.json`](./08_macro/macro_snapshot.json) |
 | **News Sentiment Tone** | `+1.45` | Average tone polarity of global news articles | Global Knowledge Graph (GDELT) 250 articles | GDELT Project API | [`10_sentiment/sentiment_snapshot.json`](./10_sentiment/sentiment_snapshot.json) |
-| **Composite AI Score** | `8.6 / 10.0 (84.3 / 100)` | 0.40 * Fund + 0.35 * Tech + 0.15 * Sent + 0.10 * Macro - Penalties | Fund=9.9, Tech=8.0, Sent=7.0, Macro/Risk=8.0 | Multi-Agent Deterministic Scoring Engine | [`21_scores/scores.json`](./21_scores/scores.json) |
+| **Composite AI Score** | `7.1 / 10.0 (67.6 / 100)` | 0.40 * Fund + 0.35 * Tech + 0.15 * Sent + 0.10 * Macro - Penalties | Fund=6.1, Tech=8.0, Sent=7.0, Macro/Risk=8.0 | Multi-Agent Deterministic Scoring Engine | [`21_scores/scores.json`](./21_scores/scores.json) |
 | **Confidence Score** | `1.00 / 1.00` | Data completeness ratio * (1.0 - Audit Penalty) | 12 / 12 Quality Gates Passed, 0 Chief Reviewer Vetoes | Quality Gatekeeper Engine (Gates 1-12) | [`24_audit/audit_log.json`](./24_audit/audit_log.json) |
 
 ---
@@ -78,10 +98,10 @@ Every number and metric presented is traceable to primary sources and mathematic
 
 ```mermaid
 graph LR
-    A["🎯 <b>AAPL</b><br/>AI Score: 8.6/10"] --> B["🟢 <b>Bull Case (+20%)</b><br/>High-margin expansion<br/>Ecosystem adoption"]
-    A --> C["🔵 <b>Base Case (+8%)</b><br/>Steady single-digit expansion<br/>Accretive capital return"]
-    A --> D["🟠 <b>Bear Case (-18%)</b><br/>Macro/Consumer slowing<br/>Fee compression"]
-    A --> E["🔴 <b>Stress Case (-35%)</b><br/>Severe supply bottleneck<br/>Trade friction"]
+    A["🎯 <b>AAPL</b><br/>AI Score: 7.1/10"] --> B["🟢 <b>Bull Case (+20%)</b><br/>Accelerated adoption of high-margin subscription services co..."]
+    A --> C["🔵 <b>Base Case (+8%)</b><br/>Steady single-digit revenue expansion, stable operating marg..."]
+    A --> D["🟠 <b>Bear Case (-18%)</b><br/>Stricter global antitrust mandates compressing platform take..."]
+    A --> E["🔴 <b>Stress Case (-35%)</b><br/>Severe global supply chain disruptions or retaliatory tariff..."]
 ```
 
 ---
@@ -100,7 +120,7 @@ flowchart TD
         R2["Antitrust & Digital Marketplace Platform Inquiries"]
         R3["Elongated Consumer Hardware Replacement Cycles"]
     end
-    Strengths --> Summary["🏁 <b>Final Verdict</b>: 8.6 / 10.0 (84.3/100)<br/>Confidence: 1.00 / 1.00"]
+    Strengths --> Summary["🏁 <b>Final Verdict</b>: 7.1 / 10.0 (67.6/100)<br/>Confidence: 1.00 / 1.00"]
     Risks --> Summary
 ```
 

@@ -1,20 +1,20 @@
 {
   "symbol": "AAPL",
   "company_name": "Apple Inc.",
-  "as_of_utc": "2026-10-10 11:47 UTC",
+  "as_of_utc": "2026-10-11 07:12 UTC",
   "horizon": "6-12 months",
-  "base_ai_score": 8.59,
-  "extended_ai_score": 8.07,
-  "normalized_100_score": 84.3,
+  "base_ai_score": 7.08,
+  "extended_ai_score": 7.22,
+  "normalized_100_score": 67.6,
   "confidence_score": 1.0,
   "sub_scores": {
-    "fundamental": 9.852,
+    "fundamental": 6.063000000000001,
     "technical": 8.0,
     "risk": 8.5,
     "sentiment": 7.0,
     "valuation": 6.5,
     "growth": 7.5,
-    "quality": 7.0,
+    "quality": 8.0,
     "business_strength": 9.0,
     "management": 8.0,
     "catalyst": 7.5,
@@ -25,39 +25,39 @@
   "observability_ledger": [
     {
       "metric": "Operating Margin",
-      "value": "31.97%",
+      "value": "15.00%",
       "derivation": "Operating Income / Total Revenue * 100",
-      "inputs": "Operating Income = $133,050,000,000, Revenue = $416,161,000,000",
+      "inputs": "Operating Income = $58,655,250,000, Revenue = $391,035,000,000",
       "primary_source": "SEC EDGAR 10-K/10-Q (us-gaap: Revenues, OperatingIncomeLoss)",
       "artifact_path": "04_filings/sec_facts.json"
     },
     {
       "metric": "Net Profit Margin",
-      "value": "26.92%",
+      "value": "23.97%",
       "derivation": "Net Income / Total Revenue * 100",
-      "inputs": "Net Income = $112,010,000,000, Revenue = $416,161,000,000",
+      "inputs": "Net Income = $93,736,000,000, Revenue = $391,035,000,000",
       "primary_source": "SEC EDGAR 10-K/10-Q (us-gaap: NetIncomeLoss)",
       "artifact_path": "04_filings/sec_facts.json"
     },
     {
       "metric": "Return on Invested Capital (ROIC)",
-      "value": "97.04%",
+      "value": "21.26%",
       "derivation": "[Operating Income * (1 - Tax Rate)] / (Total Debt + Total Equity - Cash)",
-      "inputs": "Operating Income = $133,050,000,000, Tax Rate = 16.0%, Debt = $78,328,000,000, Equity = $66,782,000,000, Cash = $29,943,000,000",
+      "inputs": "Operating Income = $58,655,250,000, Tax Rate = 16.0%, Debt = $85,750,000,000, Equity = $182,490,000,000, Cash = $36,498,000,000",
       "primary_source": "SEC EDGAR 10-K (us-gaap: LongTermDebt, StockholdersEquity, CashAndCashEquivalentsAtCarryingValue)",
       "artifact_path": "04_filings/sec_facts.json"
     },
     {
       "metric": "Free Cash Flow (FCF)",
-      "value": "$98.77B",
+      "value": "$108.81B",
       "derivation": "Operating Cash Flow - Capital Expenditures",
-      "inputs": "Operating Cash Flow = $111,482,000,000, Capex = $12,715,000,000",
+      "inputs": "Operating Cash Flow = $118,265,000,000, Capex = $9,450,000,000",
       "primary_source": "SEC EDGAR 10-K (us-gaap: NetCashProvidedByUsedInOperatingActivities, PaymentsToAcquirePropertyPlantAndEquipment)",
       "artifact_path": "04_filings/sec_facts.json"
     },
     {
       "metric": "Piotroski F-Score",
-      "value": "6 / 9 (High Quality)",
+      "value": "7 / 9 (High Quality)",
       "derivation": "Sum of 9 Fundamental Binary Quality Criteria",
       "inputs": "ROA>0, CFO>0, delta ROA>=0, CFO>NI, delta Debt<=0, delta CR>=0, No Dilution, delta GM>=0, delta AT>=0",
       "primary_source": "SEC EDGAR multi-period financial statements",
@@ -65,25 +65,25 @@
     },
     {
       "metric": "Altman Z-Score",
-      "value": "8.57 (Safe Zone)",
+      "value": "13.62 (Safe Zone)",
       "derivation": "1.2*X1 + 1.4*X2 + 3.3*X3 + 0.6*X4 + 0.999*X5",
-      "inputs": "Assets = $359,241,000,000, Sales = $416,161,000,000, EBIT = $133,050,000,000, MCap = $3.00T, Liabilities = $290.0B",
+      "inputs": "Assets = $364,980,000,000, Sales = $391,035,000,000, EBIT = $58,655,250,000, MCap = $3.51T, Liabilities = $182.5B",
       "primary_source": "SEC EDGAR 10-K balance sheet & income statement",
       "artifact_path": "04_filings/sec_facts.json"
     },
     {
       "metric": "DCF Fair Value (FCFF)",
-      "value": "$116.74",
+      "value": "$187.86",
       "derivation": "[PV(5-Yr FCF) + PV(Terminal Value) - Net Debt] / Shares",
-      "inputs": "Base FCF = $98.77B, WACC = 8.5%, Growth = 6.0%, Terminal g = 2.5%, Net Debt = $48.38B, Shares = 15.20B",
+      "inputs": "Base FCF = $108.81B, WACC = 8.5%, Growth = 6.0%, Terminal g = 2.5%, Net Debt = $49.25B, Shares = 10.43B",
       "primary_source": "Discounted Cash Flow Model + SEC 10-K share count",
       "artifact_path": "21_scores/scores.json"
     },
     {
       "metric": "Benjamin Graham Defensive Number",
-      "value": "$60.47",
+      "value": "$59.49",
       "derivation": "sqrt(22.5 * EPS * BVPS)",
-      "inputs": "EPS = $6.50, BVPS = $25.00",
+      "inputs": "EPS = $8.99, BVPS = $17.50",
       "primary_source": "Graham & Dodd Security Analysis Model",
       "artifact_path": "21_scores/scores.json"
     },
@@ -121,9 +121,9 @@
     },
     {
       "metric": "Composite AI Score",
-      "value": "8.6 / 10.0 (84.3 / 100)",
+      "value": "7.1 / 10.0 (67.6 / 100)",
       "derivation": "0.40 * Fund + 0.35 * Tech + 0.15 * Sent + 0.10 * Macro - Penalties",
-      "inputs": "Fund=9.9, Tech=8.0, Sent=7.0, Macro/Risk=8.0",
+      "inputs": "Fund=6.1, Tech=8.0, Sent=7.0, Macro/Risk=8.0",
       "primary_source": "Multi-Agent Deterministic Scoring Engine",
       "artifact_path": "21_scores/scores.json"
     },

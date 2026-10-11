@@ -43,3 +43,6 @@ htmlcov/
 Thumbs.db
 .vscode/
 .idea/
+
+# Agent Workspaces
+.superpowers/
