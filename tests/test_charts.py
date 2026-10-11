@@ -3,7 +3,11 @@ import pandas as pd
 from pathlib import Path
 import pytest
 
-from stock_analyzer.engine.charts import generate_price_action_chart
+from stock_analyzer.engine.charts import (
+    generate_financial_waterfall_chart,
+    generate_price_action_chart,
+)
+
 
 
 def test_generate_price_action_chart(tmp_path: Path):
@@ -39,3 +43,43 @@ def test_generate_price_action_chart_without_volume(tmp_path: Path):
     result = generate_price_action_chart(df, "TEST", "Test Corp", out_file)
     assert result.exists()
     assert result.stat().st_size > 1000
+
+
+def test_generate_financial_waterfall_chart(tmp_path: Path):
+    data = {
+        "revenue": 716924000000.0,
+        "operating_income": 79975000000.0,
+        "net_income": 77670000000.0,
+        "operating_cash_flow": 139514000000.0,
+        "free_cash_flow": 132777000000.0,
+    }
+    out_file = tmp_path / "financial_conversion_bars.png"
+    result = generate_financial_waterfall_chart(data, "AMZN", "Amazon.com, Inc.", out_file)
+    assert result.exists()
+    assert result == out_file
+    assert result.stat().st_size > 5000
+
+
+def test_generate_financial_waterfall_chart_zero_and_missing_values(tmp_path: Path):
+    # Empty dictionary test
+    data_empty: dict[str, float] = {}
+    out_file_empty = tmp_path / "financial_empty.png"
+    result_empty = generate_financial_waterfall_chart(data_empty, "EMPTY", "Empty Corp", out_file_empty)
+    assert result_empty.exists()
+    assert result_empty == out_file_empty
+    assert result_empty.stat().st_size > 1000
+
+    # Partial, zero, and negative values test
+    data_partial = {
+        "revenue": 10000000000.0,
+        "operating_income": -2000000000.0,
+        "net_income": -3000000000.0,
+        "operating_cash_flow": 500000000.0,
+        # free_cash_flow missing
+    }
+    out_file_partial = tmp_path / "financial_partial.png"
+    result_partial = generate_financial_waterfall_chart(data_partial, "PART", "Partial Corp", out_file_partial)
+    assert result_partial.exists()
+    assert result_partial == out_file_partial
+    assert result_partial.stat().st_size > 1000
+

@@ -525,3 +525,105 @@ def generate_price_action_chart(
     plt.close(fig)
     return output_path
 
+
+def generate_financial_waterfall_chart(
+    financials: Dict[str, float],
+    symbol: str,
+    company_name: str,
+    output_path: Path,
+) -> Path:
+    """
+    Renders 5 operational pillars: Revenue, EBIT, Net Income, CFO, and FCF.
+    """
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    financials_dict = financials or {}
+    rev = float(financials_dict.get("revenue", 0.0) or 0.0) / 1e9
+    op_inc = float(financials_dict.get("operating_income", 0.0) or 0.0) / 1e9
+    ni = float(financials_dict.get("net_income", 0.0) or 0.0) / 1e9
+    cfo = float(financials_dict.get("operating_cash_flow", 0.0) or 0.0) / 1e9
+    fcf = float(financials_dict.get("free_cash_flow", 0.0) or 0.0) / 1e9
+
+    categories = [
+        "Revenue",
+        "Operating\nIncome",
+        "Net\nIncome",
+        "Operating\nCash Flow",
+        "Free Cash\nFlow (FCF)",
+    ]
+    vals = [rev, op_inc, ni, cfo, fcf]
+    colors = ["#2563eb", "#0284c7", "#10b981", "#059669", "#16a34a"]
+
+    fig, ax = plt.subplots(figsize=(9.5, 5.2), dpi=200, facecolor="#0f172a")
+    ax.set_facecolor("#1e293b")
+
+    bars = ax.bar(
+        categories,
+        vals,
+        color=colors,
+        width=0.55,
+        edgecolor="#ffffff",
+        linewidth=1.2,
+        zorder=3,
+    )
+    ax.grid(axis="y", color="#334155", linestyle="--", linewidth=0.7, alpha=0.7, zorder=0)
+
+    max_v = max(vals)
+    min_v = min(vals)
+    val_range = max(max_v - min(0.0, min_v), 1.0)
+    offset = val_range * 0.02
+
+    # Annotate dollar billions and conversion ratios
+    for b, val in zip(bars, vals):
+        h = b.get_height()
+        label_text = f"${val:.1f}B" if val >= 0 else f"-${abs(val):.1f}B"
+        if val >= 0:
+            ax.text(
+                b.get_x() + b.get_width() / 2.0,
+                h + offset,
+                label_text,
+                ha="center",
+                va="bottom",
+                color="#f8fafc",
+                fontweight="bold",
+                fontsize=10,
+            )
+        else:
+            ax.text(
+                b.get_x() + b.get_width() / 2.0,
+                h - offset,
+                label_text,
+                ha="center",
+                va="top",
+                color="#f8fafc",
+                fontweight="bold",
+                fontsize=10,
+            )
+
+    op_m = (op_inc / rev * 100.0) if rev != 0 else 0.0
+    net_m = (ni / rev * 100.0) if rev != 0 else 0.0
+    fcf_conv = (fcf / ni * 100.0) if ni != 0 else 0.0
+
+    subtitle = (
+        f"Operating Margin: {op_m:.1f}%  |  "
+        f"Net Margin: {net_m:.1f}%  |  "
+        f"FCF Conversion: {fcf_conv:.1f}%"
+    )
+    ax.set_title(
+        f"{company_name} ({symbol}) — Financial Conversion & Cash Flow Engine\n{subtitle}",
+        fontsize=12,
+        fontweight="bold",
+        color="#f8fafc",
+        pad=14,
+    )
+    ax.tick_params(colors="#94a3b8")
+    ax.set_ylabel("USD ($ Billions)", color="#94a3b8", fontsize=10)
+
+    y_top = max(max_v * 1.15, 1.0) if max_v >= 0 else 1.0
+    y_bottom = min(min_v * 1.15, 0.0) if min_v < 0 else 0.0
+    ax.set_ylim(y_bottom, y_top)
+
+    plt.savefig(output_path, bbox_inches="tight", facecolor=fig.get_facecolor(), dpi=200)
+    plt.close(fig)
+    return output_path
+
+
