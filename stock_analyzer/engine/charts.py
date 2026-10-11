@@ -7,6 +7,7 @@ Generates:
 from pathlib import Path
 from typing import Any, Dict, Optional
 import numpy as np
+import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -395,3 +396,132 @@ def generate_technical_gauges(
     fig.savefig(output_path, dpi=200, bbox_inches="tight", facecolor="white")
     plt.close(fig)
     return output_path
+
+
+def generate_price_action_chart(
+    df: pd.DataFrame,
+    symbol: str,
+    company_name: str,
+    output_path: Path,
+) -> Path:
+    """
+    Renders 252-day price action with 50/200 SMA trend ribbon, volume, and 14-day RSI.
+    """
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    clean_df = df.copy()
+    if clean_df.empty:
+        raise ValueError("DataFrame cannot be empty")
+    if "close" not in clean_df.columns:
+        raise ValueError("DataFrame must contain 'close' column")
+
+    close = clean_df["close"].astype(float)
+    sma50 = close.rolling(50, min_periods=1).mean()
+    sma200 = close.rolling(200, min_periods=1).mean()
+
+    # RSI 14
+    delta = close.diff()
+    gain = delta.clip(lower=0.0).fillna(0.0)
+    loss = (-delta.clip(upper=0.0)).fillna(0.0)
+    avg_gain = gain.rolling(14, min_periods=1).mean()
+    avg_loss = loss.rolling(14, min_periods=1).mean()
+    rs = avg_gain / avg_loss.replace(0, 1e-6)
+    rsi14 = 100.0 - (100.0 / (1.0 + rs))
+
+    fig, (ax_price, ax_rsi) = plt.subplots(
+        2,
+        1,
+        figsize=(10, 6.5),
+        dpi=200,
+        facecolor="#0f172a",
+        gridspec_kw={"height_ratios": [3.2, 1.2], "hspace": 0.15},
+    )
+
+    x = np.arange(len(close))
+    ax_price.set_facecolor("#1e293b")
+    ax_price.plot(x, close, color="#f8fafc", linewidth=2.0, label="Daily Close")
+    ax_price.plot(x, sma50, color="#38bdf8", linewidth=1.8, label="50-Day SMA")
+    ax_price.plot(x, sma200, color="#fbbf24", linewidth=1.8, label="200-Day SMA")
+
+    # Shaded ribbon between SMAs
+    ax_price.fill_between(
+        x,
+        sma50,
+        sma200,
+        where=(sma50 >= sma200),
+        color="#22c55e",
+        alpha=0.25,
+        label="Bullish Regime",
+    )
+    ax_price.fill_between(
+        x,
+        sma50,
+        sma200,
+        where=(sma50 < sma200),
+        color="#ef4444",
+        alpha=0.25,
+        label="Bearish Regime",
+    )
+
+    # Volume bars
+    if "volume" in clean_df.columns:
+        vol = clean_df["volume"].astype(float)
+        ax_vol = ax_price.twinx()
+        ax_vol.bar(x, vol, color="#64748b", alpha=0.3, width=0.8)
+        max_vol = float(vol.max()) if len(vol) > 0 and vol.max() > 0 else 1.0
+        ax_vol.set_ylim(0, max_vol * 4.0)
+        ax_vol.axis("off")
+
+    curr_p = close.iloc[-1]
+    ax_price.set_title(
+        f"{company_name} ({symbol}) — Price Action & Trend Ribbon | Close: ${curr_p:.2f}",
+        fontsize=13,
+        fontweight="bold",
+        color="#f8fafc",
+        pad=10,
+    )
+    ax_price.grid(color="#334155", linestyle="--", linewidth=0.7, alpha=0.6)
+    ax_price.tick_params(colors="#94a3b8")
+    ax_price.legend(
+        loc="upper left",
+        facecolor="#1e293b",
+        edgecolor="#334155",
+        labelcolor="#f8fafc",
+        fontsize=9,
+    )
+    ax_price.set_xlim(0, max(1, len(close) - 1))
+    ax_price.set_xticklabels([])
+
+    # RSI Sub-panel
+    ax_rsi.set_facecolor("#1e293b")
+    ax_rsi.plot(x, rsi14, color="#a855f7", linewidth=1.8)
+    ax_rsi.axhline(70, color="#ef4444", linestyle=":", linewidth=1.2, alpha=0.8)
+    ax_rsi.axhline(30, color="#22c55e", linestyle=":", linewidth=1.2, alpha=0.8)
+    ax_rsi.fill_between(x, 70, 100, color="#ef4444", alpha=0.15)
+    ax_rsi.fill_between(x, 0, 30, color="#22c55e", alpha=0.15)
+    ax_rsi.set_ylim(0, 100)
+    ax_rsi.set_xlim(0, max(1, len(close) - 1))
+    curr_rsi = rsi14.iloc[-1]
+    ax_rsi.set_ylabel(
+        f"RSI(14): {curr_rsi:.1f}", color="#f8fafc", fontsize=10, fontweight="bold"
+    )
+    ax_rsi.grid(color="#334155", linestyle="--", linewidth=0.7, alpha=0.6)
+    ax_rsi.tick_params(colors="#94a3b8")
+
+    if isinstance(clean_df.index, pd.DatetimeIndex) and len(clean_df) > 0:
+        step = max(1, len(clean_df) // 6)
+        tick_locs = list(range(0, len(clean_df), step))
+        if tick_locs[-1] != len(clean_df) - 1:
+            tick_locs.append(len(clean_df) - 1)
+        tick_labels = [clean_df.index[i].strftime("%b %y") for i in tick_locs]
+        ax_rsi.set_xticks(tick_locs)
+        ax_rsi.set_xticklabels(tick_labels, color="#94a3b8", fontsize=8)
+
+    plt.savefig(
+        output_path,
+        bbox_inches="tight",
+        facecolor=fig.get_facecolor(),
+        dpi=200,
+    )
+    plt.close(fig)
+    return output_path
+
