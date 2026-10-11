@@ -137,6 +137,25 @@ class ResearchOrchestrator:
         with open(Path(dirs["10_sentiment"]) / "sentiment_snapshot.json", "w", encoding="utf-8") as f:
             json.dump(sentiment_data, f, indent=2)
 
+        # Ingest user-curated links from links.txt if present
+        curated_links: List[str] = []
+        symbol_root_dir = self.storage.get_symbol_dir(clean_symbol)
+        links_file = symbol_root_dir / "links.txt"
+        if links_file.exists():
+            with open(links_file, "r", encoding="utf-8") as f:
+                for line in f:
+                    url = line.strip()
+                    if url and url.startswith("http"):
+                        curated_links.append(url)
+                        prov_link = self.provenance_tracker.create_record(
+                            provider="user_curated_link",
+                            endpoint="intelligence_dossier",
+                            symbol=clean_symbol,
+                            url=url,
+                        )
+                        self.provenance_tracker.register(prov_link)
+            audit.log_event("CURATED_LINKS_LOADED", {"count": len(curated_links), "path": str(links_file)})
+
         # -------------------------------------------------------------
         # Phase 3: Data Quality Gatekeeper (Gate 4 Veto)
         # -------------------------------------------------------------
@@ -174,14 +193,26 @@ class ResearchOrchestrator:
                     return float(fy_units[-2]["val"])
             return default_val
 
-        rev_curr = _get_annual_fact(["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "SalesRevenueNet"], 416161000000.0)
-        rev_prior = _get_annual_prior_fact(["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "SalesRevenueNet"], 391035000000.0)
-        op_inc_curr = _get_annual_fact(["OperatingIncomeLoss"], 133050000000.0)
-        ni_curr = _get_annual_fact(["NetIncomeLoss"], 112010000000.0)
-        cfo_curr = _get_annual_fact(["NetCashProvidedByUsedInOperatingActivities"], 111482000000.0)
-        capex_curr = _get_annual_fact(["PaymentsToAcquirePropertyPlantAndEquipment"], 12715000000.0)
-        debt_curr = _get_annual_fact(["LongTermDebtNoncurrent", "LongTermDebt"], 78328000000.0)
-        assets_curr = _get_annual_fact(["Assets"], 359241000000.0)
+        rev_curr = _get_annual_fact(["RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "Revenues"], 100000000000.0)
+        rev_prior = _get_annual_prior_fact(["RevenueFromContractWithCustomerExcludingAssessedTax", "SalesRevenueNet", "Revenues"], rev_curr * 0.95)
+        op_inc_curr = _get_annual_fact(["OperatingIncomeLoss"], rev_curr * 0.15)
+        ni_curr = _get_annual_fact(["NetIncomeLoss"], rev_curr * 0.10)
+        cfo_curr = _get_annual_fact(["NetCashProvidedByUsedInOperatingActivities"], rev_curr * 0.18)
+        capex_curr = _get_annual_fact(["PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets"], rev_curr * 0.05)
+        debt_curr = _get_annual_fact(["LongTermDebtNoncurrent", "LongTermDebt"], rev_curr * 0.20)
+        assets_curr = _get_annual_fact(["Assets"], rev_curr * 0.90)
+
+        cash_curr = _get_annual_fact(["CashAndCashEquivalentsAtCarryingValue", "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents"], assets_curr * 0.10)
+        equity_curr = _get_annual_fact(["StockholdersEquity", "CommonStockholdersEquity"], assets_curr * 0.50)
+        curr_assets = _get_annual_fact(["AssetsCurrent"], assets_curr * 0.35)
+        curr_liab = _get_annual_fact(["LiabilitiesCurrent"], assets_curr * 0.30)
+        retained_earn = _get_annual_fact(["RetainedEarningsAccumulatedDeficit"], equity_curr * 0.60)
+        tot_liab = _get_annual_fact(["Liabilities"], max(assets_curr - equity_curr, 1.0))
+
+        # Shares outstanding
+        shares_units = us_gaap.get("CommonStockSharesOutstanding", {}).get("units", {}).get("shares", []) or \
+                       facts_payload.get("facts", {}).get("dei", {}).get("EntityCommonStockSharesOutstanding", {}).get("units", {}).get("shares", [])
+        shares_curr = float(shares_units[-1]["val"]) if shares_units else max(assets_curr / 35.0, 1000000.0)
 
         fund_metrics = self.fund_engine.compute_metrics(
             revenue_current=rev_curr,
@@ -190,8 +221,8 @@ class ResearchOrchestrator:
             operating_cash_flow=cfo_curr,
             capex=capex_curr,
             total_debt=debt_curr,
-            cash_and_equiv=29943000000.0,
-            total_equity=66782000000.0,
+            cash_and_equiv=cash_curr,
+            total_equity=equity_curr,
             operating_income=op_inc_curr,
         )
 
@@ -199,27 +230,31 @@ class ResearchOrchestrator:
             "net_income": ni_curr,
             "operating_cash_flow": cfo_curr,
             "total_assets_current": assets_curr,
-            "total_assets_prior": assets_curr * 0.96,
+            "total_assets_prior": assets_curr * 0.95,
             "long_term_debt_current": debt_curr,
             "long_term_debt_prior": debt_curr * 1.05,
         })
+
+        market_cap = indicators["current_price"] * shares_curr
         z_score, z_status = self.forensics_engine.compute_altman_z_score({
             "total_assets_current": assets_curr,
-            "current_assets": 150000000000.0,
-            "current_liabilities": 140000000000.0,
-            "retained_earnings": 10000000000.0,
-            "ebit": 123216000000.0,
-            "market_cap": 3000000000000.0,
-            "total_liabilities": 290000000000.0,
+            "current_assets": curr_assets,
+            "current_liabilities": curr_liab,
+            "retained_earnings": retained_earn,
+            "ebit": op_inc_curr,
+            "market_cap": market_cap,
+            "total_liabilities": tot_liab,
             "sales": rev_curr,
         })
 
         val_metrics = self.val_engine.compute_dcf(
             base_fcf=fund_metrics["free_cash_flow"],
-            shares_outstanding=15200000000.0,
+            shares_outstanding=shares_curr,
             net_debt=fund_metrics["net_debt"],
         )
-        graham_val = self.val_engine.compute_graham_number(eps=6.50, bvps=25.0)
+        eps_calc = ni_curr / max(shares_curr, 1.0)
+        bvps_calc = equity_curr / max(shares_curr, 1.0)
+        graham_val = self.val_engine.compute_graham_number(eps=eps_calc, bvps=bvps_calc)
         val_metrics["graham_number"] = graham_val
 
         # -------------------------------------------------------------
@@ -228,6 +263,8 @@ class ResearchOrchestrator:
         analysis_context = {
             "symbol": clean_symbol,
             "company_name": identity.company_name,
+            "sector": identity.sector,
+            "industry": identity.industry,
             "currency": identity.currency,
             "revenue": rev_curr,
             "revenue_prior": rev_prior,
@@ -236,6 +273,16 @@ class ResearchOrchestrator:
             "capex": capex_curr,
             "total_debt": debt_curr,
             "assets": assets_curr,
+            "current_assets": curr_assets,
+            "current_liabilities": curr_liab,
+            "retained_earnings": retained_earn,
+            "cash": cash_curr,
+            "equity": equity_curr,
+            "liabilities": tot_liab,
+            "shares_outstanding": shares_curr,
+            "eps": eps_calc,
+            "bvps": bvps_calc,
+            "market_cap": market_cap,
             "operating_income": op_inc_curr,
             "close": indicators["current_price"],
             "indicators": indicators,
@@ -247,6 +294,7 @@ class ResearchOrchestrator:
             "z_status": z_status,
             "macro": macro_data,
             "sentiment": sentiment_data,
+            "curated_links": curated_links,
         }
 
         specialists = [

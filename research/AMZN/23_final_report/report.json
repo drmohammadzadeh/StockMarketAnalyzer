@@ -1,0 +1,140 @@
+{
+  "symbol": "AMZN",
+  "company_name": "Amazon.com, Inc.",
+  "as_of_utc": "2026-10-11 06:10 UTC",
+  "horizon": "6-12 months",
+  "base_ai_score": 6.99,
+  "extended_ai_score": 7.17,
+  "normalized_100_score": 66.6,
+  "confidence_score": 1.0,
+  "sub_scores": {
+    "fundamental": 5.8615,
+    "technical": 8.0,
+    "risk": 8.5,
+    "sentiment": 7.0,
+    "valuation": 6.5,
+    "growth": 7.5,
+    "quality": 8.0,
+    "business_strength": 9.0,
+    "management": 8.0,
+    "catalyst": 7.5,
+    "event_risk": 8.0
+  },
+  "penalties": {},
+  "provenance_count": 15,
+  "observability_ledger": [
+    {
+      "metric": "Operating Margin",
+      "value": "11.16%",
+      "derivation": "Operating Income / Total Revenue * 100",
+      "inputs": "Operating Income = $79,975,000,000, Revenue = $716,924,000,000",
+      "primary_source": "SEC EDGAR 10-K/10-Q (us-gaap: Revenues, OperatingIncomeLoss)",
+      "artifact_path": "04_filings/sec_facts.json"
+    },
+    {
+      "metric": "Net Profit Margin",
+      "value": "10.83%",
+      "derivation": "Net Income / Total Revenue * 100",
+      "inputs": "Net Income = $77,670,000,000, Revenue = $716,924,000,000",
+      "primary_source": "SEC EDGAR 10-K/10-Q (us-gaap: NetIncomeLoss)",
+      "artifact_path": "04_filings/sec_facts.json"
+    },
+    {
+      "metric": "Return on Invested Capital (ROIC)",
+      "value": "17.23%",
+      "derivation": "[Operating Income * (1 - Tax Rate)] / (Total Debt + Total Equity - Cash)",
+      "inputs": "Operating Income = $79,975,000,000, Tax Rate = 16.0%, Debt = $65,648,000,000, Equity = $411,065,000,000, Cash = $86,810,000,000",
+      "primary_source": "SEC EDGAR 10-K (us-gaap: LongTermDebt, StockholdersEquity, CashAndCashEquivalentsAtCarryingValue)",
+      "artifact_path": "04_filings/sec_facts.json"
+    },
+    {
+      "metric": "Free Cash Flow (FCF)",
+      "value": "$132.78B",
+      "derivation": "Operating Cash Flow - Capital Expenditures",
+      "inputs": "Operating Cash Flow = $139,514,000,000, Capex = $6,737,000,000",
+      "primary_source": "SEC EDGAR 10-K (us-gaap: NetCashProvidedByUsedInOperatingActivities, PaymentsToAcquirePropertyPlantAndEquipment)",
+      "artifact_path": "04_filings/sec_facts.json"
+    },
+    {
+      "metric": "Piotroski F-Score",
+      "value": "7 / 9 (High Quality)",
+      "derivation": "Sum of 9 Fundamental Binary Quality Criteria",
+      "inputs": "ROA>0, CFO>0, delta ROA>=0, CFO>NI, delta Debt<=0, delta CR>=0, No Dilution, delta GM>=0, delta AT>=0",
+      "primary_source": "SEC EDGAR multi-period financial statements",
+      "artifact_path": "04_filings/sec_facts.json"
+    },
+    {
+      "metric": "Altman Z-Score",
+      "value": "5.82 (Safe Zone)",
+      "derivation": "1.2*X1 + 1.4*X2 + 3.3*X3 + 0.6*X4 + 0.999*X5",
+      "inputs": "Assets = $818,042,000,000, Sales = $716,924,000,000, EBIT = $79,975,000,000, MCap = $2.83T, Liabilities = $407.0B",
+      "primary_source": "SEC EDGAR 10-K balance sheet & income statement",
+      "artifact_path": "04_filings/sec_facts.json"
+    },
+    {
+      "metric": "DCF Fair Value (FCFF)",
+      "value": "$229.22",
+      "derivation": "[PV(5-Yr FCF) + PV(Terminal Value) - Net Debt] / Shares",
+      "inputs": "Base FCF = $132.78B, WACC = 8.5%, Growth = 6.0%, Terminal g = 2.5%, Net Debt = $-21.16B, Shares = 10.78B",
+      "primary_source": "Discounted Cash Flow Model + SEC 10-K share count",
+      "artifact_path": "21_scores/scores.json"
+    },
+    {
+      "metric": "Benjamin Graham Defensive Number",
+      "value": "$78.60",
+      "derivation": "sqrt(22.5 * EPS * BVPS)",
+      "inputs": "EPS = $7.20, BVPS = $38.12",
+      "primary_source": "Graham & Dodd Security Analysis Model",
+      "artifact_path": "21_scores/scores.json"
+    },
+    {
+      "metric": "14-Day RSI",
+      "value": "76.54",
+      "derivation": "100 - (100 / (1 + (Avg Gain / Avg Loss)))",
+      "inputs": "14-period daily closing changes over latest 252 bars",
+      "primary_source": "Market Trading Data (Yahoo Finance OHLCV)",
+      "artifact_path": "02_normalized_market_data/daily_ohlcv.parquet"
+    },
+    {
+      "metric": "Moving Average Trend",
+      "value": "SMA 50: $300.91 | SMA 200: $261.27 (Golden Cross)",
+      "derivation": "Arithmetic mean of 50-day and 200-day daily adjusted close",
+      "inputs": "252 historical trading bars",
+      "primary_source": "Market Trading Data (Yahoo Finance OHLCV)",
+      "artifact_path": "02_normalized_market_data/daily_ohlcv.parquet"
+    },
+    {
+      "metric": "Macroeconomic Risk-Free Rate",
+      "value": "4.25%",
+      "derivation": "10-Year Constant Maturity Treasury Yield",
+      "inputs": "FRED Series ID: DGS10",
+      "primary_source": "Federal Reserve Bank of St. Louis (FRED API)",
+      "artifact_path": "08_macro/macro_snapshot.json"
+    },
+    {
+      "metric": "News Sentiment Tone",
+      "value": "+1.45",
+      "derivation": "Average tone polarity of global news articles",
+      "inputs": "Global Knowledge Graph (GDELT) 250 articles",
+      "primary_source": "GDELT Project API",
+      "artifact_path": "10_sentiment/sentiment_snapshot.json"
+    },
+    {
+      "metric": "Composite AI Score",
+      "value": "7.0 / 10.0 (66.6 / 100)",
+      "derivation": "0.40 * Fund + 0.35 * Tech + 0.15 * Sent + 0.10 * Macro - Penalties",
+      "inputs": "Fund=5.9, Tech=8.0, Sent=7.0, Macro/Risk=8.0",
+      "primary_source": "Multi-Agent Deterministic Scoring Engine",
+      "artifact_path": "21_scores/scores.json"
+    },
+    {
+      "metric": "Confidence Score",
+      "value": "1.00 / 1.00",
+      "derivation": "Data completeness ratio * (1.0 - Audit Penalty)",
+      "inputs": "12 / 12 Quality Gates Passed, 0 Chief Reviewer Vetoes",
+      "primary_source": "Quality Gatekeeper Engine (Gates 1-12)",
+      "artifact_path": "24_audit/audit_log.json"
+    }
+  ],
+  "status": "COMPLETE"
+}

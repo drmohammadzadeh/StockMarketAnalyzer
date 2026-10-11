@@ -1,0 +1,17 @@
+{
+  "canonical_ticker": "AMZN",
+  "exchange": "NASDAQ",
+  "country": "US",
+  "currency": "USD",
+  "company_name": "Amazon.com, Inc.",
+  "cik": "0001018724",
+  "figi": "BBG000BVPV84",
+  "isin": "US0231351067",
+  "cusip": null,
+  "primary_listing": true,
+  "cross_listed_ticker": null,
+  "cross_listed_exchange": null,
+  "asset_type": "stock",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail"
+}

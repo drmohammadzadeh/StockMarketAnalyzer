@@ -26,11 +26,21 @@ def load_dotenv(env_path: Optional[Path] = None) -> None:
 
 
 def sanitize_network_environment() -> None:
-    """Ensure invalid system proxy configurations (e.g. broken Windows registry ':' proxy) do not crash HTTP clients."""
+    """Ensure invalid system proxy configurations (e.g. broken Windows registry ':' or '(null)' proxy) do not crash HTTP clients."""
     for var in ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy"):
         val = os.environ.get(var, "")
-        if val in (":", "http://:", "https://:", "http://:0"):
+        if val in (":", "http://:", "https://:", "http://:0") or "(null)" in val:
             os.environ.pop(var, None)
+
+    try:
+        import urllib.request
+        proxies = urllib.request.getproxies()
+        for k, v in list(proxies.items()):
+            if "(null)" in str(v) or str(v).endswith(":") or str(v) == ":":
+                urllib.request.getproxies = lambda: {}
+                break
+    except Exception:
+        pass
 
 
 # Auto-load on import
